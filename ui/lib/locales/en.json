@@ -650,5 +650,104 @@
 				"updateSuccess": "Prompt caching updated successfully"
 			}
 		}
+	},
+	"models": {
+		"models": {
+			"attributes": {
+				"allProviders": "All providers",
+				"attribute": "attribute",
+				"attributes": "attributes",
+				"cacheRead": "Cache Read",
+				"cacheWrite": "Cache Write",
+				"description": "Attach descriptions and tags to specific models.",
+				"descriptionColumn": "Description",
+				"editAria": "Edit attributes for {{name}}",
+				"entriesRange": "{{from}}–{{to}} of {{total}} entries",
+				"failedToLoadModels": "Failed to load models",
+				"input": "Input",
+				"modelColumn": "Model",
+				"nextPage": "Next page",
+				"noMatchingModels": "No matching models.",
+				"noModelsLoaded": "No models loaded yet.",
+				"other": "Other",
+				"output": "Output",
+				"override": "override",
+				"overrides": "overrides",
+				"pageIndicator": "Page {{current}} of {{total}}",
+				"prevPage": "Previous page",
+				"provider": "Provider",
+				"searchAria": "Search models",
+				"searchPlaceholder": "Search by model name..."
+			},
+			"common": {
+				"add": "Add",
+				"cancel": "Cancel"
+			},
+			"empty": {
+				"configureProviders": "Configure Providers",
+				"description": "Configure your first model provider to see an overview of all providers, API keys, models, and usage metrics.",
+				"title": "No providers configured yet"
+			},
+			"overriddenPrice": {
+				"effectivePrice": "Effective price: ",
+				"originalPrice": "Original price: ",
+				"overriddenByCustom": "Overridden by a custom pricing override",
+				"overriddenByNamed": "Overridden by \"{{name}}\""
+			},
+			"overview": {
+				"failedToLoadProviders": "Failed to load providers",
+				"retry": "Retry"
+			},
+			"sheet": {
+				"applied": "Applied",
+				"caveatProviderKey": "Applies only to requests routed through the matching provider key.",
+				"caveatUser": "Applies only to requests from the matching user.",
+				"caveatUserProvider": "Applies only to requests from the matching user and provider.",
+				"caveatUserProviderKey": "Applies only to requests from the matching user and provider key.",
+				"caveatVirtualKey": "Applies only to requests using the matching virtual key.",
+				"caveatVirtualKeyProvider": "Applies only to requests using the matching virtual key and provider.",
+				"caveatVirtualKeyProviderKey": "Applies only to requests using the matching virtual key and provider key.",
+				"description": "Update the description and other attributes for this model. These attributes are stored on the pricing row and preserved across the pricing sync.",
+				"descriptionPlaceholder": "A short description of this model, shown anywhere additional_attributes.description is consumed.",
+				"duplicateKeyToast": "Duplicate attribute key: {{key}}",
+				"exact": "Exact",
+				"keyPlaceholder": "key",
+				"manage": "Manage",
+				"matches": "Matches",
+				"missingKeyToast": "Attribute rows must have a key",
+				"noAdditionalAttributes": "No additional attributes. Add a key-value pair for anything beyond description.",
+				"noPermission": "You don't have permission to perform this action",
+				"noPermissionToast": "You don't have permission to perform this action",
+				"otherAttributes": "Other Attributes",
+				"pricing": "Pricing",
+				"pricingOverrides": "Pricing overrides",
+				"reservedDescriptionToast": "Use the Description field instead of a 'description' attribute row",
+				"saveChanges": "Save Changes",
+				"savedToast": "Attributes saved",
+				"saving": "Saving...",
+				"source": "Source",
+				"title": "Edit Model Attributes",
+				"valuePlaceholder": "value"
+			},
+			"table": {
+				"allProviders": "All Providers",
+				"costColumn": "Total Cost (24h)",
+				"customBadge": "CUSTOM",
+				"description": "Overview of all configured providers, models, and usage.",
+				"modelsUsedTooltip": "Models used in the last 30 days",
+				"nMore": "+{{count}} more",
+				"noMatchingProviders": "No matching providers found.",
+				"title": "Model Catalog",
+				"totalCost24h": "Total Cost (24h)",
+				"totalModels": "Total Models",
+				"totalProviders": "Total Providers",
+				"totalRequests24h": "Total Requests (24h)",
+				"trafficColumn": "Total Traffic (24h)"
+			},
+			"tabs": {
+				"models": "Models",
+				"overview": "Overview"
+			}
+		}
 	}
 }

@@ -8,6 +8,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { ProviderIconType, RenderProviderIcon } from "@/lib/constants/icons";
 import { ProviderLabels } from "@/lib/constants/logs";
 import { Info } from "lucide-react";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 function formatCost(dollars: number) {
 	return `$${dollars.toFixed(4)}`;
@@ -25,7 +27,6 @@ export interface ModelCatalogRow {
 // The filter spells "no provider filter" as a sentinel, since the control needs a value to
 // show for it. Module level so its identity is stable across renders.
 const ALL_PROVIDERS_VALUE = "all";
-const ALL_PROVIDERS_OPTION = { value: ALL_PROVIDERS_VALUE, label: "All Providers" };
 
 interface ModelCatalogTableProps {
 	rows: ModelCatalogRow[];
@@ -48,11 +49,13 @@ export default function ModelCatalogTable({
 	totalCost24h,
 	isLoadingModels,
 }: ModelCatalogTableProps) {
+	const { t } = useTranslation();
+	const allProvidersOption = useMemo(() => ({ value: ALL_PROVIDERS_VALUE, label: t("models.table.allProviders", "All Providers") }), [t]);
 	const summaryCards = [
-		{ label: "Total Providers", value: totalProviders.toLocaleString() },
-		{ label: "Total Models", value: totalModels.toLocaleString() },
-		{ label: "Total Requests (24h)", value: totalRequests24h.toLocaleString() },
-		{ label: "Total Cost (24h)", value: formatCost(totalCost24h) },
+		{ label: t("models.table.totalProviders", "Total Providers"), value: totalProviders.toLocaleString() },
+		{ label: t("models.table.totalModels", "Total Models"), value: totalModels.toLocaleString() },
+		{ label: t("models.table.totalRequests24h", "Total Requests (24h)"), value: totalRequests24h.toLocaleString() },
+		{ label: t("models.table.totalCost24h", "Total Cost (24h)"), value: formatCost(totalCost24h) },
 	];
 
 	return (
@@ -71,11 +74,13 @@ export default function ModelCatalogTable({
 
 			{/* Header + Filter */}
 			<div className="flex items-center justify-end">
-				<PageTitle title="Model Catalog">Overview of all configured providers, models, and usage.</PageTitle>
+				<PageTitle title={t("models.table.title", "Model Catalog")}>
+					{t("models.table.description", "Overview of all configured providers, models, and usage.")}
+				</PageTitle>
 				<ProviderSelector
 					data-testid="model-catalog-provider-trigger"
 					className="w-[200px]"
-					allOption={ALL_PROVIDERS_OPTION}
+					allOption={allProvidersOption}
 					value={providerFilter || ALL_PROVIDERS_VALUE}
 					onChange={(val: string) => onProviderFilterChange(val === ALL_PROVIDERS_VALUE ? "" : val)}
 				/>
@@ -92,29 +97,33 @@ export default function ModelCatalogTable({
 					</colgroup>
 					<TableHeader>
 						<TableRow>
-							<TableHead>Provider</TableHead>
+							<TableHead>{t("models.attributes.provider", "Provider")}</TableHead>
 							<TableHead>
 								<TooltipProvider>
 									<div className="flex items-center gap-1">
-										Models
+										{t("models.tabs.models", "Models")}
 										<Tooltip>
 											<TooltipTrigger data-testid="model-catalog-models-info-trigger">
 												<Info className="text-muted-foreground h-3.5 w-3.5" />
 											</TooltipTrigger>
-											<TooltipContent side="bottom">Models used in the last 30 days</TooltipContent>
+											<TooltipContent side="bottom">
+												{t("models.table.modelsUsedTooltip", "Models used in the last 30 days")}
+											</TooltipContent>
 										</Tooltip>
 									</div>
 								</TooltipProvider>
 							</TableHead>
-							<TableHead className="text-right">Total Traffic (24h)</TableHead>
-							<TableHead className="text-right">Total Cost (24h)</TableHead>
+							<TableHead className="text-right">{t("models.table.trafficColumn", "Total Traffic (24h)")}</TableHead>
+							<TableHead className="text-right">{t("models.table.costColumn", "Total Cost (24h)")}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{rows.length === 0 ? (
 							<TableRow>
 								<TableCell colSpan={4} className="h-24 text-center">
-									<span className="text-muted-foreground text-sm">No matching providers found.</span>
+									<span className="text-muted-foreground text-sm">
+										{t("models.table.noMatchingProviders", "No matching providers found.")}
+									</span>
 								</TableCell>
 							</TableRow>
 						) : (
@@ -134,7 +143,7 @@ export default function ModelCatalogTable({
 											</span>
 											{row.isCustom && (
 												<Badge variant="secondary" className="text-muted-foreground shrink-0 px-1.5 py-0.5 text-[10px] font-bold">
-													CUSTOM
+													{t("models.table.customBadge", "CUSTOM")}
 												</Badge>
 											)}
 										</div>
@@ -163,6 +172,7 @@ export default function ModelCatalogTable({
 }
 
 function ModelsUsedCell({ models: rawModels }: { models: string[] }) {
+	const { t } = useTranslation();
 	const models = Array.from(new Set(rawModels.filter(Boolean)));
 	if (models.length === 0) {
 		return <span className="text-muted-foreground text-sm">-</span>;
@@ -191,7 +201,7 @@ function ModelsUsedCell({ models: rawModels }: { models: string[] }) {
 					<Tooltip>
 						<TooltipTrigger data-testid="model-catalog-models-overflow-trigger">
 							<Badge variant="outline" className="text-xs font-normal">
-								+{remaining} more
+								+{t("models.table.nMore", "+{{count}} more", { count: remaining })}
 							</Badge>
 						</TooltipTrigger>
 						<TooltipContent side="bottom" className="max-w-xs">
