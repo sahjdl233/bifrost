@@ -1,6 +1,8 @@
 import { COMPACT_NUMBER_FORMAT, formatCompactNumber as formatNumber } from "@/lib/utils/numbers";
 import { ArrowDown, ArrowUp, ArrowUpDown, Minus } from "lucide-react";
 
+import { useTranslation } from "react-i18next";
+
 export { formatNumber, COMPACT_NUMBER_FORMAT };
 
 export function formatCost(value: number): string {
@@ -19,9 +21,14 @@ export function TrendBadge({
 	positiveIsGood?: boolean;
 	isNew?: boolean;
 }) {
+	const { t } = useTranslation();
 	// null: the previous period had none of this metric, so there is no percentage.
 	if (isNew || value === null) {
-		return <span className="inline-flex items-center gap-0.5 text-xs font-medium text-blue-600 dark:text-blue-400">new</span>;
+		return (
+			<span className="inline-flex items-center gap-0.5 text-xs font-medium text-blue-600 dark:text-blue-400">
+				{t("dashboard.common.isNew", "new")}
+			</span>
+		);
 	}
 
 	if (value === 0) {

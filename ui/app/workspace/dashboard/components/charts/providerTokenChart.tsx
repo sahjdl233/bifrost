@@ -2,6 +2,7 @@ import { StartTruncatedLabel } from "@/components/ui/truncatedLabel";
 import type { ProviderTokenHistogramResponse } from "@/lib/types/logs";
 import { formatCompactNumber } from "@/lib/utils/numbers";
 import { memo, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
 	CHART_COLORS,
@@ -11,7 +12,6 @@ import {
 	getModelColor,
 	OTHER_SERIES_COLOR,
 	OTHER_SERIES_KEY,
-	OTHER_SERIES_LABEL,
 } from "../../utils/chartUtils";
 import { CappedBarStack } from "./barShape";
 import { ChartErrorBoundary } from "./chartErrorBoundary";
@@ -26,6 +26,7 @@ interface ProviderTokenChartProps {
 }
 
 function AllProvidersTooltip({ active, payload, displayProviders }: any) {
+	const { t } = useTranslation();
 	if (!active || !payload || !payload.length) return null;
 
 	const data = payload[0]?.payload;
@@ -44,7 +45,7 @@ function AllProvidersTooltip({ active, payload, displayProviders }: any) {
 							<span className="flex items-center gap-1.5">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: isOther ? OTHER_SERIES_COLOR : getModelColor(idx) }} />
 								<StartTruncatedLabel className="max-w-[220px] text-zinc-600 dark:text-zinc-400">
-									{isOther ? OTHER_SERIES_LABEL : provider}
+									{isOther ? t("dashboard.common.other", "Other") : provider}
 								</StartTruncatedLabel>
 							</span>
 							<span className="font-medium">{formatCompactNumber(tokens)}</span>
@@ -57,6 +58,7 @@ function AllProvidersTooltip({ active, payload, displayProviders }: any) {
 }
 
 function SingleProviderTooltip({ active, payload, provider }: any) {
+	const { t } = useTranslation();
 	if (!active || !payload || !payload.length) return null;
 
 	const data = payload[0]?.payload;
@@ -72,19 +74,19 @@ function SingleProviderTooltip({ active, payload, provider }: any) {
 				<div className="flex items-center justify-between gap-4">
 					<span className="flex items-center gap-1.5">
 						<span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS.promptTokens }} />
-						<span className="text-zinc-600 dark:text-zinc-400">Input</span>
+						<span className="text-zinc-600 dark:text-zinc-400">{t("dashboard.common.input", "Input")}</span>
 					</span>
 					<span className="font-medium">{formatCompactNumber(stats.prompt_tokens || 0)}</span>
 				</div>
 				<div className="flex items-center justify-between gap-4">
 					<span className="flex items-center gap-1.5">
 						<span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS.completionTokens }} />
-						<span className="text-zinc-600 dark:text-zinc-400">Output</span>
+						<span className="text-zinc-600 dark:text-zinc-400">{t("dashboard.common.output", "Output")}</span>
 					</span>
 					<span className="font-medium">{formatCompactNumber(stats.completion_tokens || 0)}</span>
 				</div>
 				<div className="flex items-center justify-between gap-4 border-t border-zinc-200 pt-1 dark:border-zinc-700">
-					<span className="text-zinc-600 dark:text-zinc-400">Total</span>
+					<span className="text-zinc-600 dark:text-zinc-400">{t("dashboard.common.total", "Total")}</span>
 					<span className="font-medium">{formatCompactNumber(stats.total_tokens || 0)}</span>
 				</div>
 			</div>
@@ -140,8 +142,13 @@ function ProviderTokenChartImpl({ data, chartType, startTime, endTime, selectedP
 		return { chartData: processed, mode: isSingleProvider ? ("single" as const) : ("all" as const), displayProviders: providers };
 	}, [data, selectedProvider]);
 
+	const { t } = useTranslation();
 	if (!data?.buckets || chartData.length === 0) {
-		return <div className="text-muted-foreground flex h-full items-center justify-center text-sm">No data available</div>;
+		return (
+			<div className="text-muted-foreground flex h-full items-center justify-center text-sm">
+				{t("dashboard.common.noDataAvailable", "No data available")}
+			</div>
+		);
 	}
 
 	const commonProps = {

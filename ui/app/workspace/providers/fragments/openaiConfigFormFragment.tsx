@@ -9,6 +9,7 @@ import { RbacOperation, RbacResource, useRbac } from "@enterprise/lib";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { buildProviderUpdatePayload } from "../views/utils";
 
@@ -17,6 +18,7 @@ interface OpenAIConfigFormFragmentProps {
 }
 
 export function OpenAIConfigFormFragment({ provider }: OpenAIConfigFormFragmentProps) {
+	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
 	const hasUpdateProviderAccess = useRbac(RbacResource.ModelProvider, RbacOperation.Update);
 	const [updateProvider, { isLoading: isUpdatingProvider }] = useUpdateProviderMutation();
@@ -49,11 +51,11 @@ export function OpenAIConfigFormFragment({ provider }: OpenAIConfigFormFragmentP
 		)
 			.unwrap()
 			.then(() => {
-				toast.success("OpenAI configuration updated successfully");
+				toast.success(t("providers.openaiConfig.updateSuccess", "OpenAI configuration updated successfully"));
 				form.reset(data);
 			})
 			.catch((err) => {
-				toast.error("Failed to update OpenAI configuration", {
+				toast.error(t("providers.openaiConfig.updateFailed", "Failed to update OpenAI configuration"), {
 					description: getErrorMessage(err),
 				});
 			});
@@ -70,11 +72,12 @@ export function OpenAIConfigFormFragment({ provider }: OpenAIConfigFormFragmentP
 							<FormItem>
 								<div className="flex items-center justify-between space-x-2">
 									<div className="space-y-0.5">
-										<FormLabel>Disable Store</FormLabel>
+										<FormLabel>{t("providers.openaiConfig.disableStore", "Disable Store")}</FormLabel>
 										<p className="text-muted-foreground text-xs">
-											With the Responses API, store defaults to true, and when it is on, the generated response is stored for later
-											retrieval via API. OpenAI exposes endpoints to retrieve and delete stored responses, so your response IDs become
-											durable server-side objects instead of one-shot IDs.
+											{t(
+												"providers.openaiConfig.disableStoreDescription",
+												"With the Responses API, store defaults to true, and when it is on, the generated response is stored for later retrieval via API. OpenAI exposes endpoints to retrieve and delete stored responses, so your response IDs become durable server-side objects instead of one-shot IDs.",
+											)}
 										</p>
 									</div>
 									<FormControl>
@@ -102,7 +105,7 @@ export function OpenAIConfigFormFragment({ provider }: OpenAIConfigFormFragmentP
 						disabled={!form.formState.isDirty || !form.formState.isValid || !hasUpdateProviderAccess || isUpdatingProvider}
 						isLoading={isUpdatingProvider}
 					>
-						Save OpenAI Configuration
+						{t("providers.openaiConfig.saveButton", "Save OpenAI Configuration")}
 					</Button>
 				</div>
 			</form>

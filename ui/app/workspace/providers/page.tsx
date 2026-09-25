@@ -27,6 +27,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { AlertCircle, ArrowLeft, Server } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import AddCustomProviderSheet from "./dialogs/addNewCustomProviderSheet";
 import ConfirmDeleteProviderDialog from "./dialogs/confirmDeleteProviderDialog";
@@ -37,6 +38,7 @@ import { AddProviderDropdown } from "./views/addProviderDropdown";
 import { ProvidersEmptyState } from "./views/providersEmptyState";
 
 export default function Providers() {
+	const { t } = useTranslation();
 	const isMobile = useIsMobile();
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -134,8 +136,10 @@ export default function Providers() {
 					);
 					return;
 				}
-				toast.error("Something went wrong", {
-					description: `We encountered an error while getting provider config: ${getErrorMessage(err)}`,
+				toast.error(t("providers.page.somethingWentWrong", "Something went wrong"), {
+					description: t("providers.page.getProviderConfigError", "We encountered an error while getting provider config: {{error}}", {
+						error: getErrorMessage(err),
+					}),
 				});
 			});
 	}, [provider, isLoadingProviders]);
@@ -288,7 +292,9 @@ export default function Providers() {
 				<TooltipProvider>
 					<div className="flex min-h-0 flex-1 flex-col rounded-md bg-zinc-50/50 md:p-4 md:pb-0 dark:bg-zinc-800/20">
 						{/* Pinned lane title */}
-						<div className="text-muted-foreground mb-2 shrink-0 text-xs font-medium">Configured Providers</div>
+						<div className="text-muted-foreground mb-2 shrink-0 text-xs font-medium">
+							{t("providers.page.configuredProviders", "Configured Providers")}
+						</div>
 
 						{/* Configured providers (standard with keys + custom): the only scrolling region */}
 						<div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto">
@@ -328,7 +334,7 @@ export default function Providers() {
 											<ProviderStatusBadge status={p.provider_status} />
 											{isCustom && (
 												<Badge variant="secondary" className="text-muted-foreground ml-auto shrink-0 px-1.5 py-0.5 text-[10px] font-bold">
-													CUSTOM
+													{t("providers.page.customBadge", "CUSTOM")}
 												</Badge>
 											)}
 										</div>
@@ -337,7 +343,9 @@ export default function Providers() {
 							) : (
 								<div data-testid="providers-lane-empty" className="flex flex-col items-center justify-center gap-2 px-4 py-8 text-center">
 									<Server className="text-muted-foreground h-8 w-8" strokeWidth={1} />
-									<div className="text-muted-foreground text-xs">No providers configured yet</div>
+									<div className="text-muted-foreground text-xs">
+										{t("providers.page.noProvidersConfiguredYet", "No providers configured yet")}
+									</div>
 								</div>
 							)}
 
@@ -360,7 +368,7 @@ export default function Providers() {
 			<div className={cn("min-w-0 w-full", mobileDetailOpen ? "block" : "hidden md:block")}>
 				<Button variant="ghost" size="sm" className="mb-3 -ml-2 md:hidden" onClick={() => setMobileDetailOpen(false)}>
 					<ArrowLeft className="size-4" />
-					Providers
+					{t("providers.page.providers", "Providers")}
 				</Button>
 				{isLoadingProvider && (
 					<div className="bg-muted/10 flex w-full items-center justify-center rounded-md md:max-h-[calc(var(--app-content-viewport)_-_300px)]">
@@ -369,7 +377,7 @@ export default function Providers() {
 				)}
 				{!selectedProvider && (
 					<div className="bg-muted/10 flex w-full items-center justify-center rounded-md md:max-h-[calc(var(--app-content-viewport)_-_300px)]">
-						<div className="text-muted-foreground text-sm">Select a provider</div>
+						<div className="text-muted-foreground text-sm">{t("providers.page.selectProvider", "Select a provider")}</div>
 					</div>
 				)}
 				{!isLoadingProvider && selectedProvider && (
@@ -381,12 +389,17 @@ export default function Providers() {
 }
 
 function ProviderStatusBadge({ status }: { status: ProviderStatus }) {
+	const { t } = useTranslation();
 	return status != "active" ? (
 		<Tooltip>
 			<TooltipTrigger>
 				<AlertCircle className="h-3 w-3" />
 			</TooltipTrigger>
-			<TooltipContent>{status === "error" ? "Provider could not be initialized" : "Provider is deleted"}</TooltipContent>
+			<TooltipContent>
+				{status === "error"
+					? t("providers.page.providerInitFailed", "Provider could not be initialized")
+					: t("providers.page.providerDeleted", "Provider is deleted")}
+			</TooltipContent>
 		</Tooltip>
 	) : null;
 }
@@ -399,6 +412,7 @@ function KeyDiscoveryFailedBadge({
 		description?: string;
 	};
 }) {
+	const { t } = useTranslation();
 	const providerFailed = provider.status === "list_models_failed";
 
 	if (!providerFailed) return null;
@@ -408,7 +422,9 @@ function KeyDiscoveryFailedBadge({
 			<TooltipTrigger>
 				<AlertCircle className="h-3 w-3" />
 			</TooltipTrigger>
-			<TooltipContent>{provider.description || "Provider model discovery failed."}</TooltipContent>
+			<TooltipContent>
+				{provider.description || t("providers.page.modelDiscoveryFailed", "Provider model discovery failed.")}
+			</TooltipContent>
 		</Tooltip>
 	);
 }

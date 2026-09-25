@@ -12,13 +12,13 @@ import type {
 import { COMPACT_NUMBER_FORMAT } from "@/lib/utils/numbers";
 import NumberFlow from "@number-flow/react";
 import { memo, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	CHART_COLORS,
 	CHART_HEADER_LEGEND_CLASS,
 	LATENCY_COLORS,
 	OTHER_SERIES_COLOR,
 	OTHER_SERIES_KEY,
-	OTHER_SERIES_LABEL,
 	THROUGHPUT_COLOR,
 	formatTokensPerSecond,
 	getModelColor,
@@ -130,6 +130,7 @@ function OverviewTabImpl({
 	onCostModelChange,
 	onUsageModelChange,
 }: OverviewTabProps) {
+	const { t } = useTranslation();
 	const volumeTotal = useMemo(() => {
 		if (!histogramData?.buckets) return null;
 		return histogramData.buckets.reduce((sum, b) => sum + (b.count ?? 0), 0);
@@ -209,10 +210,10 @@ function OverviewTabImpl({
 			<div className="grid grid-cols-1 gap-2 lg:grid-cols-2 2xl:grid-cols-3">
 				{/* Cost Chart: first so spend is the first thing the page answers. */}
 				<ChartCard
-					title="Cost"
+					title={t("dashboard.chart.cost", "Cost")}
 					loading={loadingCost}
 					testId="chart-cost-total"
-					totalLabel="Total"
+					totalLabel={t("dashboard.common.total", "Total")}
 					total={
 						costTotal !== null ? (
 							<NumberFlow value={costTotal} format={{ ...COMPACT_NUMBER_FORMAT, style: "currency", currency: "USD" }} />
@@ -241,7 +242,7 @@ function OverviewTabImpl({
 											<Tooltip>
 												<TooltipTrigger asChild>
 													<span tabIndex={0} data-testid="cost-legend-more-trigger" className="text-muted-foreground cursor-default">
-														+{costModels.length - 1} more
+														+{t("dashboard.common.nMore", "+{{count}} more", { count: costModels.length - 1 })}
 													</span>
 												</TooltipTrigger>
 												<TooltipContent>
@@ -254,7 +255,7 @@ function OverviewTabImpl({
 																		backgroundColor: model === OTHER_SERIES_KEY ? OTHER_SERIES_COLOR : getModelColor(idx + 1),
 																	}}
 																/>
-																{model === OTHER_SERIES_KEY ? OTHER_SERIES_LABEL : model}
+																{model === OTHER_SERIES_KEY ? t("dashboard.common.other", "Other") : model}
 															</span>
 														))}
 													</div>
@@ -293,25 +294,25 @@ function OverviewTabImpl({
 
 				{/* Log Volume Chart */}
 				<ChartCard
-					title="Request Volume"
+					title={t("dashboard.chart.requestVolume", "Request Volume")}
 					loading={loadingHistogram}
 					testId="chart-log-volume"
-					totalLabel="Total"
+					totalLabel={t("dashboard.common.total", "Total")}
 					total={volumeTotal !== null ? <NumberFlow value={volumeTotal} format={COMPACT_NUMBER_FORMAT} /> : undefined}
 					totalTooltip={volumeTotal !== null ? volumeTotal.toLocaleString("en-US") : undefined}
 					legend={
 						<div className={CHART_HEADER_LEGEND_CLASS}>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS.success }} />
-								<span className="text-muted-foreground">Success</span>
+								<span className="text-muted-foreground">{t("dashboard.common.success", "Success")}</span>
 							</span>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS.error }} />
-								<span className="text-muted-foreground">Error</span>
+								<span className="text-muted-foreground">{t("dashboard.common.error", "Error")}</span>
 							</span>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS.cancelled }} />
-								<span className="text-muted-foreground">Cancelled</span>
+								<span className="text-muted-foreground">{t("dashboard.common.cancelled", "Cancelled")}</span>
 							</span>
 						</div>
 					}
@@ -324,25 +325,25 @@ function OverviewTabImpl({
 
 				{/* Token Usage Chart */}
 				<ChartCard
-					title="Token Usage"
+					title={t("dashboard.chart.tokenUsage", "Token Usage")}
 					loading={loadingTokens}
 					testId="chart-token-usage"
-					totalLabel="Total"
+					totalLabel={t("dashboard.common.total", "Total")}
 					total={tokenTotal !== null ? <NumberFlow value={tokenTotal} format={COMPACT_NUMBER_FORMAT} /> : undefined}
 					totalTooltip={tokenTotal !== null ? tokenTotal.toLocaleString("en-US") : undefined}
 					legend={
 						<div className={CHART_HEADER_LEGEND_CLASS}>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS.promptTokens }} />
-								<span className="text-muted-foreground">Input</span>
+								<span className="text-muted-foreground">{t("dashboard.common.input", "Input")}</span>
 							</span>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS.completionTokens }} />
-								<span className="text-muted-foreground">Output</span>
+								<span className="text-muted-foreground">{t("dashboard.common.output", "Output")}</span>
 							</span>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS.cachedReadTokens }} />
-								<span className="text-muted-foreground">Cached</span>
+								<span className="text-muted-foreground">{t("dashboard.common.cached", "Cached")}</span>
 							</span>
 						</div>
 					}
@@ -352,21 +353,25 @@ function OverviewTabImpl({
 				</ChartCard>
 
 				{/* External Cache Hit Rate Meter */}
-				<ChartCard title="External Cache Hit Rate" loading={loadingTokens} testId="chart-cache-external">
+				<ChartCard
+					title={t("dashboard.chart.externalCacheHitRate", "External Cache Hit Rate")}
+					loading={loadingTokens}
+					testId="chart-cache-external"
+				>
 					<ExternalCacheTokenMeterChart data={tokenData} />
 				</ChartCard>
 
 				{/* Local Cache Hit Rate Meter */}
-				<ChartCard title="Local Cache Hit Rate" loading={loadingStats} testId="chart-cache-local">
+				<ChartCard title={t("dashboard.chart.localCacheHitRate", "Local Cache Hit Rate")} loading={loadingStats} testId="chart-cache-local">
 					<LocalCacheTokenMeterChart data={logsStats} />
 				</ChartCard>
 
 				{/* Model Usage Chart */}
 				<ChartCard
-					title="Model Usage"
+					title={t("dashboard.chart.modelUsage", "Model Usage")}
 					loading={loadingModels}
 					testId="chart-model-usage"
-					totalLabel="Total"
+					totalLabel={t("dashboard.common.total", "Total")}
 					total={modelUsageTotal !== null ? <NumberFlow value={modelUsageTotal} format={COMPACT_NUMBER_FORMAT} /> : undefined}
 					totalTooltip={modelUsageTotal !== null ? modelUsageTotal.toLocaleString("en-US") : undefined}
 					legend={
@@ -387,7 +392,7 @@ function OverviewTabImpl({
 											<Tooltip>
 												<TooltipTrigger asChild>
 													<span tabIndex={0} data-testid="usage-legend-more-trigger" className="text-muted-foreground cursor-default">
-														+{usageModels.length - 1} more
+														+{t("dashboard.common.nMore", "+{{count}} more", { count: usageModels.length - 1 })}
 													</span>
 												</TooltipTrigger>
 												<TooltipContent>
@@ -400,7 +405,7 @@ function OverviewTabImpl({
 																		backgroundColor: model === OTHER_SERIES_KEY ? OTHER_SERIES_COLOR : getModelColor(idx + 1),
 																	}}
 																/>
-																{model === OTHER_SERIES_KEY ? OTHER_SERIES_LABEL : model}
+																{model === OTHER_SERIES_KEY ? t("dashboard.common.other", "Other") : model}
 															</span>
 														))}
 													</div>
@@ -413,15 +418,15 @@ function OverviewTabImpl({
 								<>
 									<span className="flex items-center gap-1">
 										<span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: CHART_COLORS.success }} />
-										<span className="text-muted-foreground">Success</span>
+										<span className="text-muted-foreground">{t("dashboard.common.success", "Success")}</span>
 									</span>
 									<span className="flex items-center gap-1">
 										<span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: CHART_COLORS.error }} />
-										<span className="text-muted-foreground">Error</span>
+										<span className="text-muted-foreground">{t("dashboard.common.error", "Error")}</span>
 									</span>
 									<span className="flex items-center gap-1">
 										<span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: CHART_COLORS.cancelled }} />
-										<span className="text-muted-foreground">Cancelled</span>
+										<span className="text-muted-foreground">{t("dashboard.common.cancelled", "Cancelled")}</span>
 									</span>
 								</>
 							)}
@@ -444,10 +449,10 @@ function OverviewTabImpl({
 
 				{/* Latency Chart */}
 				<ChartCard
-					title="Latency"
+					title={t("dashboard.chart.latency", "Latency")}
 					loading={loadingLatency}
 					testId="chart-latency"
-					totalLabel="Avg"
+					totalLabel={t("dashboard.common.avg", "Avg")}
 					total={
 						latencyAvg !== null ? (
 							<NumberFlow value={latencyAvg} format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }} suffix="ms" />
@@ -458,7 +463,7 @@ function OverviewTabImpl({
 						<div className={CHART_HEADER_LEGEND_CLASS}>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: LATENCY_COLORS.avg }} />
-								<span className="text-muted-foreground">Avg</span>
+								<span className="text-muted-foreground">{t("dashboard.common.avg", "Avg")}</span>
 							</span>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: LATENCY_COLORS.p90 }} />
@@ -483,10 +488,10 @@ function OverviewTabImpl({
 
 				{/* Bifrost Overhead Chart */}
 				<ChartCard
-					title="Bifrost Overhead"
+					title={t("dashboard.chart.overhead", "Bifrost Overhead")}
 					loading={loadingLatency}
 					testId="chart-overhead"
-					totalLabel="Avg"
+					totalLabel={t("dashboard.common.avg", "Avg")}
 					total={
 						overheadAvg !== null ? (
 							<NumberFlow value={overheadAvg} format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }} suffix="ms" />
@@ -497,7 +502,7 @@ function OverviewTabImpl({
 						<div className={CHART_HEADER_LEGEND_CLASS}>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: LATENCY_COLORS.avg }} />
-								<span className="text-muted-foreground">Avg</span>
+								<span className="text-muted-foreground">{t("dashboard.common.avg", "Avg")}</span>
 							</span>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: LATENCY_COLORS.p90 }} />
@@ -522,10 +527,10 @@ function OverviewTabImpl({
 
 				{/* Throughput (tokens/sec) Chart */}
 				<ChartCard
-					title="Throughput"
+					title={t("dashboard.chart.throughput", "Throughput")}
 					loading={loadingThroughput}
 					testId="chart-throughput"
-					totalLabel="Avg"
+					totalLabel={t("dashboard.common.avg", "Avg")}
 					total={
 						throughputAvg !== null ? <span className="truncate whitespace-nowrap">{formatTokensPerSecond(throughputAvg)}</span> : undefined
 					}
@@ -536,7 +541,7 @@ function OverviewTabImpl({
 						<div className={CHART_HEADER_LEGEND_CLASS}>
 							<span className="flex items-center gap-1">
 								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: THROUGHPUT_COLOR }} />
-								<span className="text-muted-foreground">Tokens/sec</span>
+								<span className="text-muted-foreground">{t("dashboard.chart.tokensPerSec", "Tokens/sec")}</span>
 							</span>
 						</div>
 					}

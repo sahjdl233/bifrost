@@ -2,6 +2,7 @@ import PageTitle from "@/components/pageTitle";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getErrorMessage, useGetCoreConfigQuery, useGetDroppedRequestsQuery, useUpdateCoreConfigMutation } from "@/lib/store";
@@ -13,6 +14,7 @@ import { useGetLargePayloadConfigQuery, useUpdateLargePayloadConfigMutation } fr
 import { DefaultLargePayloadConfig, LargePayloadConfig } from "@enterprise/lib/types/largePayload";
 import { Info, Plus, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import UserAgentMappingsView from "./userAgentMappingsView";
 
@@ -67,6 +69,14 @@ function largePayloadConfigEqual(a: LargePayloadConfig, b: LargePayloadConfig): 
 
 export default function ClientSettingsView() {
 	const hasSettingsUpdateAccess = useRbac(RbacResource.Settings, RbacOperation.Update);
+	const { t, i18n } = useTranslation();
+	const activeLanguage = i18n.language?.startsWith("zh") ? "zh-CN" : "en";
+	const changeLanguage = useCallback(
+		(lng: string) => {
+			void i18n.changeLanguage(lng);
+		},
+		[i18n],
+	);
 	const [droppedRequests, setDroppedRequests] = useState<number>(0);
 	const { data: droppedRequestsData } = useGetDroppedRequestsQuery();
 	const { data: bifrostConfig, isLoading: isCoreConfigLoading } = useGetCoreConfigQuery({ fromDB: true });
@@ -288,7 +298,26 @@ export default function ClientSettingsView() {
 
 	return (
 		<div className="mx-auto w-full max-w-4xl space-y-6">
-			<PageTitle title="Client Settings">Configure client behavior and request handling.</PageTitle>
+			<PageTitle title={t("settings.clientTitle")}>{t("settings.clientDescription")}</PageTitle>
+
+			{/* Language (client-only preference) */}
+			<div className="flex items-center justify-between space-x-2">
+				<div className="space-y-0.5">
+					<label htmlFor="client-language" className="text-sm font-medium">
+						{t("settings.language")}
+					</label>
+					<p className="text-muted-foreground text-sm">{t("settings.languageDescription")}</p>
+				</div>
+				<Select value={activeLanguage} onValueChange={changeLanguage}>
+					<SelectTrigger id="client-language" className="w-44" data-testid="client-settings-language-select">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="en">{t("common.english")}</SelectItem>
+						<SelectItem value="zh-CN">{t("common.chinese")}</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
 
 			<div className="space-y-4">
 				{/* Drop Excess Requests */}

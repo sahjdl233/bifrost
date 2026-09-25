@@ -8,6 +8,7 @@ import { isRequestTypeDisabled } from "@/lib/utils/validation";
 import { Settings2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { Control, useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
 interface AllowedRequestsFieldsProps {
 	control: Control<any>;
@@ -96,6 +97,9 @@ const PathOverrideUnsupported = new Set<RequestType>([
 	"responses_input_items",
 ]);
 
+// Converts a snake_case RequestType into its camelCase i18n key suffix, e.g. "list_models" -> "listModels".
+const requestTypeI18nKey = (key: RequestType): string => key.replace(/_([a-z])/g, (_, char) => char.toUpperCase());
+
 export function AllowedRequestsFields({
 	control,
 	namePrefix = "allowed_requests",
@@ -103,6 +107,7 @@ export function AllowedRequestsFields({
 	providerType,
 	disabled = false,
 }: AllowedRequestsFieldsProps) {
+	const { t } = useTranslation();
 	const leftColumn = RequestTypes.slice(0, RequestTypes.length / 2);
 	const rightColumn = RequestTypes.slice(RequestTypes.length / 2);
 	const { getValues, setValue } = useFormContext();
@@ -131,7 +136,9 @@ export function AllowedRequestsFields({
 						className={`flex flex-row items-center justify-between rounded-sm border p-3 ${isDisabled ? "bg-muted/30 opacity-60" : ""}`}
 					>
 						<div className="space-y-0.5">
-							<FormLabel className={isDisabled ? "cursor-not-allowed" : ""}>{requestType.label}</FormLabel>
+							<FormLabel className={isDisabled ? "cursor-not-allowed" : ""}>
+								{t(`providers.allowedRequests.${requestTypeI18nKey(requestType.key)}`, requestType.label)}
+							</FormLabel>
 						</div>
 						<div className="flex items-center gap-2">
 							{/* Settings icon for path override - only show when enabled */}
@@ -149,16 +156,19 @@ export function AllowedRequestsFields({
 													<button
 														type="button"
 														className="text-muted-foreground hover:text-foreground transition-colors"
-														aria-label="Customize endpoint path"
+														aria-label={t("providers.allowedRequests.customizePathAria", "Customize endpoint path")}
 													>
 														<Settings2 className="h-4 w-4" />
 													</button>
 												</PopoverTrigger>
 												<PopoverContent className="w-80" align="end" onOpenAutoFocus={(e) => e.preventDefault()}>
 													<div className="space-y-2">
-														<h4 className="text-sm font-medium">Custom Path or URL</h4>
+														<h4 className="text-sm font-medium">{t("providers.allowedRequests.customPathOrUrl", "Custom Path or URL")}</h4>
 														<p className="text-muted-foreground text-xs">
-															Override with a path (e.g., /v1/chat) or a full URL (e.g., https://api.example.com/chat) to bypass base_url
+															{t(
+																"providers.allowedRequests.pathOverrideDescription",
+																"Override with a path (e.g., /v1/chat) or a full URL (e.g., https://api.example.com/chat) to bypass base_url",
+															)}
 														</p>
 														<Input placeholder={placeholder} {...pathField} value={pathField.value || ""} className="h-9" />
 													</div>
@@ -178,7 +188,7 @@ export function AllowedRequestsFields({
 												</div>
 											</TooltipTrigger>
 											<TooltipContent>
-												<p>Not supported by {providerType}</p>
+												<p>{t("providers.allowedRequests.notSupportedBy", "Not supported by {{provider}}", { provider: providerType })}</p>
 											</TooltipContent>
 										</Tooltip>
 									</TooltipProvider>
@@ -196,10 +206,12 @@ export function AllowedRequestsFields({
 	return (
 		<div className="space-y-4">
 			<div>
-				<div className="text-sm font-medium">Allowed Request Types</div>
+				<div className="text-sm font-medium">{t("providers.allowedRequests.allowedRequestTypes", "Allowed Request Types")}</div>
 				<p className="text-muted-foreground text-xs">
-					Select which request types this custom provider can handle.{" "}
-					{!isPathOverrideDisabled ? "Click the settings icon to customize endpoint paths or use full URLs." : ""}
+					{t("providers.allowedRequests.description", "Select which request types this custom provider can handle.")}{" "}
+					{!isPathOverrideDisabled
+						? t("providers.allowedRequests.customizeHint", "Click the settings icon to customize endpoint paths or use full URLs.")
+						: ""}
 				</p>
 			</div>
 

@@ -10,6 +10,7 @@ import { BaseProvider, ModelProviderName } from "@/lib/types/config";
 import { allowedRequestsSchema } from "@/lib/types/schemas";
 import { cleanPathOverrides } from "@/lib/utils/validation";
 import { RbacOperation, RbacResource, useRbac } from "@enterprise/lib";
+import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -42,6 +43,7 @@ interface Props extends AddCustomProviderSheetContentProps {
 }
 
 export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: AddCustomProviderSheetContentProps) {
+	const { t } = useTranslation();
 	const hasProviderCreateAccess = useRbac(RbacResource.ModelProvider, RbacOperation.Create);
 	const [addProvider, { isLoading: isAddingProvider }] = useCreateProviderMutation();
 	const form = useForm<FormData>({
@@ -128,7 +130,7 @@ export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: 
 				form.reset();
 			})
 			.catch((err) => {
-				toast.error("Failed to add provider", {
+				toast.error(t("providers.addCustom.failedToAdd", "Failed to add provider"), {
 					description: getErrorMessage(err),
 				});
 			});
@@ -159,8 +161,8 @@ export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: 
 	return (
 		<>
 			<SheetHeader className="flex shrink-0 flex-col items-start py-4" headerClassName="mb-0 sticky -top-4 bg-card z-10 px-4 md:px-8">
-				<SheetTitle>Add Custom Provider</SheetTitle>
-				<SheetDescription>Enter the details of your custom provider.</SheetDescription>
+				<SheetTitle>{t("providers.addCustom.title", "Add Custom Provider")}</SheetTitle>
+				<SheetDescription>{t("providers.addCustom.description", "Enter the details of your custom provider.")}</SheetDescription>
 			</SheetHeader>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
@@ -170,10 +172,15 @@ export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: 
 							name="name"
 							render={({ field }) => (
 								<FormItem className="flex flex-col gap-3">
-									<FormLabel className="text-right">Name</FormLabel>
+									<FormLabel className="text-right">{t("providers.addCustom.name", "Name")}</FormLabel>
 									<div className="col-span-3">
 										<FormControl>
-											<Input placeholder="Name" data-testid="custom-provider-name" disabled={!hasProviderCreateAccess} {...field} />
+											<Input
+												placeholder={t("providers.addCustom.namePlaceholder", "Name")}
+												data-testid="custom-provider-name"
+												disabled={!hasProviderCreateAccess}
+												{...field}
+											/>
 										</FormControl>
 										<FormMessage />
 									</div>
@@ -185,7 +192,7 @@ export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: 
 							name="baseFormat"
 							render={({ field }) => (
 								<FormItem className="flex flex-col gap-3">
-									<FormLabel>Base Format</FormLabel>
+									<FormLabel>{t("providers.addCustom.baseFormat", "Base Format")}</FormLabel>
 									<div>
 										<FormControl>
 											<BaseProviderSelector
@@ -205,7 +212,7 @@ export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: 
 							name="base_url"
 							render={({ field }) => (
 								<FormItem className="flex flex-col gap-3">
-									<FormLabel>Base URL</FormLabel>
+									<FormLabel>{t("providers.common.baseUrl", "Base URL")}</FormLabel>
 									<div>
 										<FormControl>
 											<Input
@@ -229,10 +236,13 @@ export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: 
 									<div className="bg-muted/50 flex items-center justify-between space-x-2 rounded-sm border p-3">
 										<div className="space-y-0.5">
 											<label htmlFor="allow-private-network" className="text-sm font-medium">
-												Allow Private Network
+												{t("providers.addCustom.allowPrivateNetwork", "Allow Private Network")}
 											</label>
 											<p className="text-muted-foreground text-sm">
-												Allow connecting to private network IPs (e.g. 192.168.x.x, 10.x.x.x). Link-local addresses remain blocked.
+												{t(
+													"providers.addCustom.allowPrivateNetworkDesc",
+													"Allow connecting to private network IPs (e.g. 192.168.x.x, 10.x.x.x). Link-local addresses remain blocked.",
+												)}
 											</p>
 										</div>
 										<Switch
@@ -256,9 +266,11 @@ export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: 
 										<div className="bg-muted/50 flex items-center justify-between space-x-2 rounded-sm border p-3">
 											<div className="space-y-0.5">
 												<label htmlFor="drop-excess-requests" className="text-sm font-medium">
-													Is Keyless?
+													{t("providers.addCustom.isKeyless", "Is Keyless?")}
 												</label>
-												<p className="text-muted-foreground text-sm">Whether the custom provider requires a key</p>
+												<p className="text-muted-foreground text-sm">
+													{t("providers.addCustom.isKeylessDesc", "Whether the custom provider requires a key")}
+												</p>
 											</div>
 											<Switch
 												id="drop-excess-requests"
@@ -282,10 +294,13 @@ export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: 
 										<div className="bg-muted/50 flex items-center justify-between space-x-2 rounded-sm border p-3">
 											<div className="space-y-0.5">
 												<label htmlFor="does-not-send-done-marker" className="text-sm font-medium">
-													Does Not Send [DONE] Marker?
+													{t("providers.addCustom.noDoneMarker", "Does Not Send [DONE] Marker?")}
 												</label>
 												<p className="text-muted-foreground text-sm">
-													Whether the provider ends streams on finish_reason without sending a [DONE] marker
+													{t(
+														"providers.addCustom.noDoneMarkerDesc",
+														"Whether the provider ends streams on finish_reason without sending a [DONE] marker",
+													)}
 												</p>
 											</div>
 											<Switch
@@ -310,11 +325,13 @@ export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: 
 										<div className="bg-muted/50 flex items-center justify-between space-x-2 rounded-sm border p-3">
 											<div className="space-y-0.5">
 												<label htmlFor="wait-for-usage" className="text-sm font-medium">
-													Wait For Trailing Usage Chunk?
+													{t("providers.addCustom.waitForUsage", "Wait For Trailing Usage Chunk?")}
 												</label>
 												<p className="text-muted-foreground text-sm">
-													Keep reading after finish_reason so the trailing usage chunk is collected. Without this the request records zero
-													tokens and zero cost
+													{t(
+														"providers.addCustom.waitForUsageDesc",
+														"Keep reading after finish_reason so the trailing usage chunk is collected. Without this the request records zero tokens and zero cost",
+													)}
 												</p>
 											</div>
 											<Switch
@@ -339,10 +356,10 @@ export function AddCustomProviderSheetContent({ show = true, onClose, onSave }: 
 					</div>
 					<div className="bg-card sticky bottom-0 ml-auto flex w-full flex-row gap-2 border-t px-4 py-4 md:px-8">
 						<Button type="button" variant="outline" onClick={onClose} className="ml-auto" data-testid="custom-provider-cancel-btn">
-							Cancel
+							{t("providers.common.cancel", "Cancel")}
 						</Button>
 						<Button type="submit" isLoading={isAddingProvider} disabled={!hasProviderCreateAccess} data-testid="custom-provider-save-btn">
-							Add
+							{t("providers.common.add", "Add")}
 						</Button>
 					</div>
 				</form>

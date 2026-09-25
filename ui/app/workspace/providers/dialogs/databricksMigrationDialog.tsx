@@ -56,6 +56,7 @@ import {
 import { RbacOperation, RbacResource, useRbac } from "@enterprise/lib";
 import { AlertTriangle, Check, CircleDashed, Loader2, X } from "lucide-react";
 import { ReactNode, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Props {
 	show: boolean;
@@ -72,6 +73,13 @@ const API_FORMAT_LABELS: Record<DatabricksApiFormat, string> = {
 	ai_gateway: "AI Gateway",
 };
 
+// i18n keys for the API format option labels.
+const API_FORMAT_LABEL_KEYS: Record<DatabricksApiFormat, string> = {
+	auto: "providers.migration.apiFormatAuto",
+	model_serving: "providers.migration.apiFormatModelServing",
+	ai_gateway: "providers.migration.apiFormatAiGateway",
+};
+
 /** Wraps an RTK error so the pure orchestrator can read a message and HTTP status. */
 const wrapError = (err: unknown): Error =>
 	Object.assign(new Error(getErrorMessage(err)), {
@@ -79,6 +87,7 @@ const wrapError = (err: unknown): Error =>
 	});
 
 export default function DatabricksMigrationDialog({ show, provider, onDeferred, onMigrated }: Props) {
+	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
 	const providerFormIsDirty = useAppSelector((state) => state.provider.isDirty);
 	const canCreate = useRbac(RbacResource.ModelProvider, RbacOperation.Create);
@@ -210,9 +219,9 @@ export default function DatabricksMigrationDialog({ show, provider, onDeferred, 
 	};
 
 	const migrateDisabledReason = !hasAccess
-		? "Migrating requires create, update and delete access to providers."
+		? t("providers.migration.noAccessReason", "Migrating requires create, update and delete access to providers.")
 		: providerFormIsDirty
-			? "Save or discard your unsaved provider changes first."
+			? t("providers.migration.dirtyStateReason", "Save or discard your unsaved provider changes first.")
 			: undefined;
 
 	const canMigrate = !!plan && !migrateDisabledReason && !planNeedsInput(plan);
@@ -225,29 +234,40 @@ export default function DatabricksMigrationDialog({ show, provider, onDeferred, 
 						<RenderProviderIcon provider={DATABRICKS_PROVIDER as ProviderIconType} size="sm" className="h-5 w-5 shrink-0" />
 						{stage === "finished" && result
 							? result.ok
-								? "Migration complete"
-								: "Migration failed"
-							: "Databricks is now a first-party provider"}
+								? t("providers.migration.migrationComplete", "Migration complete")
+								: t("providers.migration.migrationFailed", "Migration failed")
+							: t("providers.migration.title", "Databricks is now a first-party provider")}
 					</AlertDialogTitle>
 					<AlertDialogDescription asChild>
 						<div className="space-y-2">
 							{(stage === "intro" || stage === "loading") && (
 								<>
 									<p>
-										<span className="text-foreground font-medium">{provider.name}</span> is a custom provider pointing at a Databricks
-										workspace. Bifrost now supports Databricks natively, with personal access tokens, OAuth service principals, Model
-										Serving and AI Gateway routing. Your existing configuration needs to be migrated to the official provider.
+										<span className="text-foreground font-medium">{provider.name}</span>{" "}
+										{t(
+											"providers.migration.introCustomProvider",
+											"is a custom provider pointing at a Databricks workspace. Bifrost now supports Databricks natively, with personal access tokens, OAuth service principals, Model Serving and AI Gateway routing. Your existing configuration needs to be migrated to the official provider.",
+										)}
 									</p>
 									<p>
-										Nothing changes until you confirm. You will see exactly what will be copied before the migration runs, and the custom
-										provider is only removed after the new one is verified.
+										{t(
+											"providers.migration.introNoChanges",
+											"Nothing changes until you confirm. You will see exactly what will be copied before the migration runs, and the custom provider is only removed after the new one is verified.",
+										)}
 									</p>
 								</>
 							)}
 							{stage === "preview" && (
-								<p>Review what will be migrated. Secrets are masked; anything that could not be read must be entered below.</p>
+								<p>
+									{t(
+										"providers.migration.previewDescription",
+										"Review what will be migrated. Secrets are masked; anything that could not be read must be entered below.",
+									)}
+								</p>
 							)}
-							{stage === "running" && <p>Migrating. Keep this window open until it finishes.</p>}
+							{stage === "running" && (
+								<p>{t("providers.migration.runningDescription", "Migrating. Keep this window open until it finishes.")}</p>
+							)}
 							{stage === "finished" && result && <p>{result.message}</p>}
 						</div>
 					</AlertDialogDescription>
@@ -256,7 +276,7 @@ export default function DatabricksMigrationDialog({ show, provider, onDeferred, 
 				{loadError && (
 					<Alert variant="destructive">
 						<AlertTriangle className="h-4 w-4" />
-						<AlertTitle>Could not read the custom provider</AlertTitle>
+						<AlertTitle>{t("providers.migration.loadErrorTitle", "Could not read the custom provider")}</AlertTitle>
 						<AlertDescription>{loadError}</AlertDescription>
 					</Alert>
 				)}
@@ -276,7 +296,7 @@ export default function DatabricksMigrationDialog({ show, provider, onDeferred, 
 					{(stage === "intro" || stage === "loading") && (
 						<>
 							<AlertDialogCancel onClick={onDeferred} disabled={stage === "loading"} data-testid="databricks-migration-not-now">
-								Not now
+								{t("providers.migration.notNow", "Not now")}
 							</AlertDialogCancel>
 							<DisabledTooltip reason={migrateDisabledReason}>
 								<Button
@@ -285,7 +305,7 @@ export default function DatabricksMigrationDialog({ show, provider, onDeferred, 
 									data-testid="databricks-migration-start"
 								>
 									{stage === "loading" && <Loader2 className="h-4 w-4 animate-spin" />}
-									Let&apos;s migrate
+									{t("providers.migration.letsMigrate", "Let's migrate")}
 								</Button>
 							</DisabledTooltip>
 						</>
@@ -293,14 +313,19 @@ export default function DatabricksMigrationDialog({ show, provider, onDeferred, 
 					{stage === "preview" && (
 						<>
 							<Button variant="ghost" onClick={() => setStage("intro")}>
-								Back
+								{t("providers.migration.back", "Back")}
 							</Button>
-							<AlertDialogCancel onClick={onDeferred}>Not now</AlertDialogCancel>
+							<AlertDialogCancel onClick={onDeferred}>{t("providers.migration.notNow", "Not now")}</AlertDialogCancel>
 							<DisabledTooltip
-								reason={migrateDisabledReason ?? (plan && planNeedsInput(plan) ? "Fill in the missing values above." : undefined)}
+								reason={
+									migrateDisabledReason ??
+									(plan && planNeedsInput(plan)
+										? t("providers.migration.fillMissingValues", "Fill in the missing values above.")
+										: undefined)
+								}
 							>
 								<Button onClick={runMigration} disabled={!canMigrate} data-testid="databricks-migration-confirm">
-									Migrate
+									{t("providers.migration.migrate", "Migrate")}
 								</Button>
 							</DisabledTooltip>
 						</>
@@ -309,12 +334,12 @@ export default function DatabricksMigrationDialog({ show, provider, onDeferred, 
 						<>
 							{!result.ok && (
 								<AlertDialogCancel onClick={onDeferred} data-testid="databricks-migration-close">
-									Close
+									{t("providers.common.close", "Close")}
 								</AlertDialogCancel>
 							)}
 							{result.ok && (
 								<AlertDialogAction onClick={onMigrated} data-testid="databricks-migration-done">
-									Go to Databricks
+									{t("providers.migration.goToDatabricks", "Go to Databricks")}
 								</AlertDialogAction>
 							)}
 						</>
@@ -345,6 +370,7 @@ interface PreviewProps {
 }
 
 function MigrationPreview({ plan, onWorkspaceUrlChange, onApiFormatChange, onKeyValueChange }: PreviewProps) {
+	const { t } = useTranslation();
 	const net = plan.providerSettings.network_config;
 	const perf = plan.providerSettings.concurrency_and_buffer_size;
 	const otherHeaders = Object.keys(net.extra_headers ?? {});
@@ -352,10 +378,10 @@ function MigrationPreview({ plan, onWorkspaceUrlChange, onApiFormatChange, onKey
 	return (
 		<div className="space-y-4 text-sm" data-testid="databricks-migration-preview">
 			<section className="space-y-2">
-				<SectionTitle>Workspace</SectionTitle>
+				<SectionTitle>{t("providers.migration.workspaceSection", "Workspace")}</SectionTitle>
 				<div className="grid gap-3 sm:grid-cols-[1fr_180px]">
 					<div className="space-y-1">
-						<Label htmlFor="databricks-migration-workspace-url">Workspace URL</Label>
+						<Label htmlFor="databricks-migration-workspace-url">{t("providers.migration.workspaceUrl", "Workspace URL")}</Label>
 						<Input
 							id="databricks-migration-workspace-url"
 							data-testid="databricks-migration-workspace-url"
@@ -366,7 +392,7 @@ function MigrationPreview({ plan, onWorkspaceUrlChange, onApiFormatChange, onKey
 						/>
 					</div>
 					<div className="space-y-1">
-						<Label>Inference surface</Label>
+						<Label>{t("providers.migration.inferenceSurface", "Inference surface")}</Label>
 						<Select value={plan.apiFormat} onValueChange={(v) => onApiFormatChange(v as DatabricksApiFormat)}>
 							<SelectTrigger data-testid="databricks-migration-api-format">
 								<SelectValue />
@@ -374,7 +400,7 @@ function MigrationPreview({ plan, onWorkspaceUrlChange, onApiFormatChange, onKey
 							<SelectContent>
 								{(Object.keys(API_FORMAT_LABELS) as DatabricksApiFormat[]).map((format) => (
 									<SelectItem key={format} value={format}>
-										{API_FORMAT_LABELS[format]}
+										{t(API_FORMAT_LABEL_KEYS[format], API_FORMAT_LABELS[format])}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -385,10 +411,12 @@ function MigrationPreview({ plan, onWorkspaceUrlChange, onApiFormatChange, onKey
 
 			<section className="space-y-2">
 				<SectionTitle>
-					{plan.keys.length === 1 && plan.source.isKeyless ? "Authentication" : `Keys (${plan.keys.length})`}
+					{plan.keys.length === 1 && plan.source.isKeyless
+						? t("providers.migration.authentication", "Authentication")
+						: t("providers.migration.keysCount", "Keys ({{count}})", { count: plan.keys.length })}
 					{plan.targetExists && (
 						<Badge variant="secondary" className="ml-2">
-							added to existing provider
+							{t("providers.migration.addedToExistingProvider", "added to existing provider")}
 						</Badge>
 					)}
 				</SectionTitle>
@@ -399,26 +427,45 @@ function MigrationPreview({ plan, onWorkspaceUrlChange, onApiFormatChange, onKey
 								<span className="font-medium">{key.name}</span>
 								{key.fromHeader && (
 									<Badge variant="outline" className="text-muted-foreground">
-										from Authorization header
+										{t("providers.migration.fromAuthorizationHeader", "from Authorization header")}
 									</Badge>
 								)}
 								{key.createName !== key.name && (
 									<Badge variant="outline" className="text-muted-foreground">
-										created as {key.createName}, renamed after cleanup
+										{t("providers.migration.createdAsRenamed", "created as {{name}}, renamed after cleanup", { name: key.createName })}
 									</Badge>
 								)}
 							</div>
 							<div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
-								<span>Models: {key.models.length === 0 || key.models.includes("*") ? "all" : key.models.join(", ")}</span>
-								{key.blacklisted_models.length > 0 && <span>Blacklisted: {key.blacklisted_models.join(", ")}</span>}
-								<span>Weight: {key.weight}</span>
-								<span>Aliases: {Object.keys(key.aliases ?? {}).length}</span>
-								{!key.enabled && <span>Disabled</span>}
+								<span>
+									{t("providers.migration.modelsLabel", "Models: {{models}}", {
+										models:
+											key.models.length === 0 || key.models.includes("*") ? t("providers.migration.all", "all") : key.models.join(", "),
+									})}
+								</span>
+								{key.blacklisted_models.length > 0 && (
+									<span>
+										{t("providers.migration.blacklistedLabel", "Blacklisted: {{models}}", {
+											models: key.blacklisted_models.join(", "),
+										})}
+									</span>
+								)}
+								<span>
+									{t("providers.migration.weightLabel", "Weight: {{weight}}", {
+										weight: key.weight,
+									})}
+								</span>
+								<span>
+									{t("providers.migration.aliasesLabel", "Aliases: {{count}}", {
+										count: Object.keys(key.aliases ?? {}).length,
+									})}
+								</span>
+								{!key.enabled && <span>{t("providers.common.disabled", "Disabled")}</span>}
 							</div>
 							{key.needsValue || !isSecretVarSet(key.value) ? (
 								<div className="space-y-1">
 									<Label htmlFor={`databricks-migration-token-${key.tempId}`}>
-										Personal access token <span className="text-destructive">*</span>
+										{t("providers.migration.personalAccessToken", "Personal access token")} <span className="text-destructive">*</span>
 									</Label>
 									<SecretVarInput
 										id={`databricks-migration-token-${key.tempId}`}
@@ -429,13 +476,15 @@ function MigrationPreview({ plan, onWorkspaceUrlChange, onApiFormatChange, onKey
 									/>
 									<p className="text-muted-foreground text-xs">
 										{key.fromHeader
-											? "The token could not be read from the custom provider."
-											: "Stored secrets are masked and cannot be copied; enter it again."}
+											? t("providers.migration.tokenNotReadable", "The token could not be read from the custom provider.")
+											: t("providers.migration.tokenMasked", "Stored secrets are masked and cannot be copied; enter it again.")}
 									</p>
 								</div>
 							) : (
 								<div className="text-xs">
-									<span className="text-muted-foreground">Personal access token: </span>
+									<span className="text-muted-foreground">
+										{t("providers.migration.personalAccessTokenColon", "Personal access token: ")}
+									</span>
 									<code className="bg-muted rounded px-1 py-0.5 font-mono" data-testid={`databricks-migration-masked-${key.tempId}`}>
 										{maskSecret(key.value)}
 									</code>
@@ -448,25 +497,38 @@ function MigrationPreview({ plan, onWorkspaceUrlChange, onApiFormatChange, onKey
 
 			<section className="space-y-2">
 				<SectionTitle>
-					Provider settings
+					{t("providers.migration.providerSettingsSection", "Provider settings")}
 					{plan.targetExists && (
 						<Badge variant="secondary" className="ml-2">
-							existing settings kept
+							{t("providers.migration.existingSettingsKept", "existing settings kept")}
 						</Badge>
 					)}
 				</SectionTitle>
 				<dl className="text-muted-foreground grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-3">
-					<Stat label="Timeout" value={`${net.default_request_timeout_in_seconds}s`} />
-					<Stat label="Retries" value={String(net.max_retries)} />
-					<Stat label="Backoff" value={`${net.retry_backoff_initial}ms → ${net.retry_backoff_max}ms`} />
-					<Stat label="Concurrency" value={String(perf.concurrency)} />
-					<Stat label="Buffer size" value={String(perf.buffer_size)} />
-					<Stat label="Proxy" value={plan.providerSettings.proxy_config?.type ?? "none"} />
-					<Stat label="Extra headers" value={otherHeaders.length > 0 ? otherHeaders.join(", ") : "none"} />
-					<Stat label="Private network" value={net.allow_private_network ? "allowed" : "blocked"} />
+					<Stat label={t("providers.common.timeout", "Timeout")} value={`${net.default_request_timeout_in_seconds}s`} />
+					<Stat label={t("providers.migration.retries", "Retries")} value={String(net.max_retries)} />
+					<Stat label={t("providers.migration.backoff", "Backoff")} value={`${net.retry_backoff_initial}ms → ${net.retry_backoff_max}ms`} />
+					<Stat label={t("providers.migration.concurrency", "Concurrency")} value={String(perf.concurrency)} />
+					<Stat label={t("providers.migration.bufferSize", "Buffer size")} value={String(perf.buffer_size)} />
 					<Stat
-						label="Raw request/response"
-						value={plan.providerSettings.send_back_raw_request || plan.providerSettings.send_back_raw_response ? "on" : "off"}
+						label={t("providers.migration.proxy", "Proxy")}
+						value={plan.providerSettings.proxy_config?.type ?? t("providers.migration.none", "none")}
+					/>
+					<Stat
+						label={t("providers.migration.extraHeaders", "Extra headers")}
+						value={otherHeaders.length > 0 ? otherHeaders.join(", ") : t("providers.migration.none", "none")}
+					/>
+					<Stat
+						label={t("providers.migration.privateNetwork", "Private network")}
+						value={net.allow_private_network ? t("providers.migration.allowed", "allowed") : t("providers.migration.blocked", "blocked")}
+					/>
+					<Stat
+						label={t("providers.migration.rawRequestResponse", "Raw request/response")}
+						value={
+							plan.providerSettings.send_back_raw_request || plan.providerSettings.send_back_raw_response
+								? t("providers.migration.on", "on")
+								: t("providers.migration.off", "off")
+						}
 					/>
 				</dl>
 			</section>
@@ -474,7 +536,7 @@ function MigrationPreview({ plan, onWorkspaceUrlChange, onApiFormatChange, onKey
 			{plan.warnings.length > 0 && (
 				<Alert variant={plan.nameClash ? "destructive" : "default"} data-testid="databricks-migration-warnings">
 					<AlertTriangle className="h-4 w-4" />
-					<AlertTitle>Before you continue</AlertTitle>
+					<AlertTitle>{t("providers.migration.beforeYouContinue", "Before you continue")}</AlertTitle>
 					<AlertDescription>
 						<ul className="list-disc space-y-1 pl-4">
 							{plan.warnings.map((warning) => (

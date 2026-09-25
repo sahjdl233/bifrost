@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { RbacOperation, RbacResource, useRbac } from "@enterprise/lib";
 import { AlertCircle, CheckCircle2, EllipsisIcon, PencilIcon, PlusIcon, RefreshCwIcon, TrashIcon } from "lucide-react";
 import { ReactNode, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import AddNewKeySheet from "../dialogs/addNewKeySheet";
 
@@ -50,6 +51,7 @@ function ProviderKeyActionsMenu({
 	onEdit: (keyId: string) => void;
 	onDelete: (keyId: string) => void;
 }) {
+	const { t } = useTranslation();
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
@@ -69,7 +71,7 @@ function ProviderKeyActionsMenu({
 					disabled={!hasUpdateAccess}
 				>
 					<PencilIcon className="mr-1 h-4 w-4" />
-					Edit
+					{t("providers.common.edit", "Edit")}
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					variant="destructive"
@@ -81,7 +83,7 @@ function ProviderKeyActionsMenu({
 					disabled={!hasDeleteAccess}
 				>
 					<TrashIcon className="mr-1 h-4 w-4" />
-					Delete
+					{t("providers.common.delete", "Delete")}
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
@@ -89,6 +91,7 @@ function ProviderKeyActionsMenu({
 }
 
 export default function ModelProviderKeysTableView({ provider, className, headerActions, isKeyless }: Props) {
+	const { t } = useTranslation();
 	const providerName = provider.name?.toLowerCase() ?? "";
 	const isVLLM = providerName === "vllm";
 	const isOllamaOrSGL = providerName === "ollama" || providerName === "sgl";
@@ -120,11 +123,16 @@ export default function ModelProviderKeysTableView({ provider, className, header
 	async function handleRefreshProviderModels() {
 		try {
 			await refreshProviderModels(provider.name).unwrap();
-			toast.success("Model list refreshed", {
-				description: `Re-checked every enabled ${entityLabel} for ${provider.name}.`,
+			toast.success(t("providers.keys.modelListRefreshed", "Model list refreshed"), {
+				description: t("providers.keys.refreshAllDescription", "Re-checked every enabled {{entity}} for {{provider}}.", {
+					entity: entityLabel,
+					provider: provider.name,
+				}),
 			});
 		} catch (err) {
-			toast.error("Failed to refresh model list", { description: getErrorMessage(err) });
+			toast.error(t("providers.keys.modelListRefreshFailed", "Failed to refresh model list"), {
+				description: getErrorMessage(err),
+			});
 		}
 	}
 
@@ -132,9 +140,15 @@ export default function ModelProviderKeysTableView({ provider, className, header
 		setRefreshingKeyIds((prev) => new Set(prev).add(keyId));
 		try {
 			await refreshProviderKeyModels({ provider: provider.name, keyId }).unwrap();
-			toast.success("Model list refreshed", { description: `Re-checked ${keyName}.` });
+			toast.success(t("providers.keys.modelListRefreshed", "Model list refreshed"), {
+				description: t("providers.keys.refreshKeyDescription", "Re-checked {{keyName}}.", {
+					keyName,
+				}),
+			});
 		} catch (err) {
-			toast.error("Failed to refresh model list", { description: getErrorMessage(err) });
+			toast.error(t("providers.keys.modelListRefreshFailed", "Failed to refresh model list"), {
+				description: getErrorMessage(err),
+			});
 		} finally {
 			setRefreshingKeyIds((prev) => {
 				const next = new Set(prev);
@@ -150,14 +164,16 @@ export default function ModelProviderKeysTableView({ provider, className, header
 				<AlertDialog open={showDeleteKeyDialog.show}>
 					<AlertDialogContent onClick={(e) => e.stopPropagation()}>
 						<AlertDialogHeader>
-							<AlertDialogTitle>Delete {EntityLabel}</AlertDialogTitle>
+							<AlertDialogTitle>{t("providers.keys.deleteTitle", "Delete {{entity}}", { entity: EntityLabel })}</AlertDialogTitle>
 							<AlertDialogDescription>
-								Are you sure you want to delete this {entityLabel}. This action cannot be undone.
+								{t("providers.keys.deleteConfirmation", "Are you sure you want to delete this {{entity}}. This action cannot be undone.", {
+									entity: entityLabel,
+								})}
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter className="pt-4">
 							<AlertDialogCancel onClick={() => setShowDeleteKeyDialog(undefined)} disabled={isMutatingProviderKey}>
-								Cancel
+								{t("providers.common.cancel", "Cancel")}
 							</AlertDialogCancel>
 							<AlertDialogAction
 								disabled={isMutatingProviderKey || !hasDeleteProviderAccess}
@@ -168,17 +184,26 @@ export default function ModelProviderKeysTableView({ provider, className, header
 									})
 										.unwrap()
 										.then(() => {
-											toast.success(`${EntityLabel} deleted successfully`);
+											toast.success(
+												t("providers.keys.deletedSuccessfully", "{{entity}} deleted successfully", {
+													entity: EntityLabel,
+												}),
+											);
 											setShowDeleteKeyDialog(undefined);
 										})
 										.catch((err) => {
-											toast.error(`Failed to delete ${entityLabel}`, {
-												description: getErrorMessage(err),
-											});
+											toast.error(
+												t("providers.keys.deleteFailed", "Failed to delete {{entity}}", {
+													entity: entityLabel,
+												}),
+												{
+													description: getErrorMessage(err),
+												},
+											);
 										});
 								}}
 							>
-								Delete
+								{t("providers.common.delete", "Delete")}
 							</AlertDialogAction>
 						</AlertDialogFooter>
 					</AlertDialogContent>
@@ -195,7 +220,11 @@ export default function ModelProviderKeysTableView({ provider, className, header
 			)}
 			<CardHeader className="mb-4 px-0">
 				<CardTitle className="flex flex-col items-stretch gap-3 md:flex-row md:items-center md:justify-between">
-					<div className="flex items-center gap-2">Configured {entityLabelPlural}</div>
+					<div className="flex items-center gap-2">
+						{t("providers.keys.configuredEntities", "Configured {{entity}}", {
+							entity: entityLabelPlural,
+						})}
+					</div>
 					<div className="flex min-w-0 flex-wrap items-center gap-2">
 						{headerActions}
 						{hasUpdateProviderAccess ? (
@@ -206,15 +235,26 @@ export default function ModelProviderKeysTableView({ provider, className, header
 										className="size-9 px-0 xl:h-9 xl:w-auto xl:px-4"
 										disabled={isRefreshing}
 										data-testid="provider-refresh-models"
-										aria-label={isRefreshingProvider ? "Refreshing model list" : "Refresh model list"}
+										aria-label={
+											isRefreshingProvider
+												? t("providers.keys.refreshingModelList", "Refreshing model list")
+												: t("providers.keys.refreshModelList", "Refresh model list")
+										}
 										onClick={handleRefreshProviderModels}
 									>
 										<RefreshCwIcon className={cn("h-4 w-4", isRefreshingProvider && "animate-spin")} />
-										<span className="hidden xl:inline">{isRefreshingProvider ? "Refreshing..." : "Refresh model list"}</span>
+										<span className="hidden xl:inline">
+											{isRefreshingProvider
+												? t("providers.keys.refreshing", "Refreshing...")
+												: t("providers.keys.refreshModelList", "Refresh model list")}
+										</span>
 									</Button>
 								</TooltipTrigger>
 								<TooltipContent className="max-w-xs">
-									Re-check what models this provider serves. Otherwise this runs on the interval set in Model Settings.
+									{t(
+										"providers.keys.refreshModelsTooltip",
+										"Re-check what models this provider serves. Otherwise this runs on the interval set in Model Settings.",
+									)}
 								</TooltipContent>
 							</Tooltip>
 						) : null}
@@ -224,17 +264,21 @@ export default function ModelProviderKeysTableView({ provider, className, header
 									<Button
 										disabled={!hasUpdateProviderAccess}
 										data-testid="add-key-btn"
-										aria-label={`Add ${EntityLabel}`}
+										aria-label={t("providers.keys.addEntity", "Add {{entity}}", {
+											entity: EntityLabel,
+										})}
 										className="size-9 px-0 xl:h-9 xl:w-auto xl:px-4"
 										onClick={() => {
 											handleAddKey();
 										}}
 									>
 										<PlusIcon className="h-4 w-4" />
-										<span className="hidden xl:inline">Add {EntityLabel}</span>
+										<span className="hidden xl:inline">{t("providers.keys.addEntity", "Add {{entity}}", { entity: EntityLabel })}</span>
 									</Button>
 								</TooltipTrigger>
-								<TooltipContent className="xl:hidden">Add {EntityLabel}</TooltipContent>
+								<TooltipContent className="xl:hidden">
+									{t("providers.keys.addEntity", "Add {{entity}}", { entity: EntityLabel })}
+								</TooltipContent>
 							</Tooltip>
 						) : null}
 					</div>
@@ -242,8 +286,8 @@ export default function ModelProviderKeysTableView({ provider, className, header
 			</CardHeader>
 			{isKeyless ? (
 				<div className="text-muted-foreground flex flex-col items-center justify-center gap-2 rounded-sm border py-10 text-center text-sm">
-					<p>This is a keyless provider - no API keys are required.</p>
-					<p>You can edit the provider configuration using the button above.</p>
+					<p>{t("providers.keys.keylessProvider", "This is a keyless provider - no API keys are required.")}</p>
+					<p>{t("providers.keys.keylessEditHint", "You can edit the provider configuration using the button above.")}</p>
 				</div>
 			) : (
 				<div className="flex w-full flex-col gap-2 rounded-sm border">
@@ -256,9 +300,15 @@ export default function ModelProviderKeysTableView({ provider, className, header
 						</colgroup>
 						<TableHeader className="w-full">
 							<TableRow>
-								<TableHead>{isVLLM ? "Model" : isOllamaOrSGL ? "Server" : "API Key"}</TableHead>
-								<TableHead>Weight</TableHead>
-								<TableHead>Enabled</TableHead>
+								<TableHead>
+									{isVLLM
+										? t("providers.keys.modelColumn", "Model")
+										: isOllamaOrSGL
+											? t("providers.keys.serverColumn", "Server")
+											: t("providers.common.apiKey", "API Key")}
+								</TableHead>
+								<TableHead>{t("providers.common.weight", "Weight")}</TableHead>
+								<TableHead>{t("providers.common.enabled", "Enabled")}</TableHead>
 								<TableHead className="text-right"></TableHead>
 							</TableRow>
 						</TableHeader>
@@ -266,7 +316,9 @@ export default function ModelProviderKeysTableView({ provider, className, header
 							{keys.length === 0 && (
 								<TableRow data-testid="keys-table-empty-state">
 									<TableCell colSpan={4} className="py-6 text-center">
-										No {entityLabelPlural} found.
+										{t("providers.keys.noEntitiesFound", "No {{entity}} found.", {
+											entity: entityLabelPlural,
+										})}
 									</TableCell>
 								</TableRow>
 							)}
@@ -286,14 +338,14 @@ export default function ModelProviderKeysTableView({ provider, className, header
 														<TooltipTrigger asChild>
 															<button
 																type="button"
-																aria-label="Key status: list models working"
+																aria-label={t("providers.keys.statusWorkingAria", "Key status: list models working")}
 																data-testid={`key-status-success-${key.name}`}
 																className="inline-flex"
 															>
 																<CheckCircle2 aria-hidden className="h-4 w-4 flex-shrink-0 text-green-600" />
 															</button>
 														</TooltipTrigger>
-														<TooltipContent>List models working</TooltipContent>
+														<TooltipContent>{t("providers.keys.statusWorking", "List models working")}</TooltipContent>
 													</Tooltip>
 												)}
 												{key.status === "list_models_failed" &&
@@ -315,7 +367,7 @@ export default function ModelProviderKeysTableView({ provider, className, header
 																<TooltipTrigger asChild>
 																	<button
 																		type="button"
-																		aria-label="Key status: secret reference may not be resolved"
+																		aria-label={t("providers.keys.statusSecretRefAria", "Key status: secret reference may not be resolved")}
 																		data-testid={`key-status-warning-${key.name}`}
 																		className="inline-flex"
 																	>
@@ -323,7 +375,11 @@ export default function ModelProviderKeysTableView({ provider, className, header
 																	</button>
 																</TooltipTrigger>
 																<TooltipContent className="max-w-xs break-words">
-																	{key.description}; verify the secret reference is configured on the server
+																	{t(
+																		"providers.keys.statusSecretRef",
+																		"{{description}}; verify the secret reference is configured on the server",
+																		{ description: key.description },
+																	)}
 																</TooltipContent>
 															</Tooltip>
 														) : (
@@ -331,7 +387,7 @@ export default function ModelProviderKeysTableView({ provider, className, header
 																<TooltipTrigger asChild>
 																	<button
 																		type="button"
-																		aria-label="Key status: list models failed"
+																		aria-label={t("providers.keys.statusFailedAria", "Key status: list models failed")}
 																		data-testid={`key-status-error-${key.name}`}
 																		className="inline-flex"
 																	>
@@ -339,7 +395,7 @@ export default function ModelProviderKeysTableView({ provider, className, header
 																	</button>
 																</TooltipTrigger>
 																<TooltipContent className="max-w-xs break-words">
-																	{key.description || "Model discovery failed for this key"}
+																	{key.description || t("providers.keys.modelDiscoveryFailed", "Model discovery failed for this key")}
 																</TooltipContent>
 															</Tooltip>
 														);
@@ -367,10 +423,21 @@ export default function ModelProviderKeysTableView({ provider, className, header
 													})
 														.unwrap()
 														.then(() => {
-															toast.success(`${EntityLabel} ${checked ? "enabled" : "disabled"} successfully`);
+															toast.success(
+																checked
+																	? t("providers.keys.enabledSuccessfully", "{{entity}} enabled successfully", { entity: EntityLabel })
+																	: t("providers.keys.disabledSuccessfully", "{{entity}} disabled successfully", { entity: EntityLabel }),
+															);
 														})
 														.catch((err) => {
-															toast.error(`Failed to update ${entityLabel}`, { description: getErrorMessage(err) });
+															toast.error(
+																t("providers.keys.updateFailed", "Failed to update {{entity}}", {
+																	entity: entityLabel,
+																}),
+																{
+																	description: getErrorMessage(err),
+																},
+															);
 														})
 														.finally(() => {
 															setTogglingKeyIds((prev) => {
@@ -397,7 +464,7 @@ export default function ModelProviderKeysTableView({ provider, className, header
 																	// would report a failure the user cannot act on.
 																	disabled={isRefreshing || !isKeyEnabled}
 																	data-testid={`key-refresh-models-${key.name}`}
-																	aria-label={`Refresh model list for ${key.name}`}
+																	aria-label={t("providers.keys.refreshForKeyAria", "Refresh model list for {{name}}", { name: key.name })}
 																	onClick={(e) => {
 																		e.stopPropagation();
 																		handleRefreshKeyModels(key.id, key.name);
@@ -409,8 +476,10 @@ export default function ModelProviderKeysTableView({ provider, className, header
 														</TooltipTrigger>
 														<TooltipContent>
 															{isKeyEnabled
-																? `Refresh model list for this ${entityLabel}`
-																: `Enable this ${entityLabel} to refresh its model list`}
+																? t("providers.keys.refreshForEntity", "Refresh model list for this {{entity}}", { entity: entityLabel })
+																: t("providers.keys.enableToRefresh", "Enable this {{entity}} to refresh its model list", {
+																		entity: entityLabel,
+																	})}
 														</TooltipContent>
 													</Tooltip>
 												) : null}

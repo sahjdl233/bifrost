@@ -1,6 +1,7 @@
 // Chart utility functions for the dashboard
 import { formatCompactNumber } from "@/lib/utils/numbers";
 
+import i18n from "@/lib/i18n";
 // Format timestamp based on bucket size
 export function formatTimestamp(timestamp: string, bucketSizeSeconds: number): string {
 	const date = new Date(timestamp);
@@ -65,17 +66,14 @@ export function getModelColor(index: number): string {
 // "+N more", so the data path follows the palette.
 export const TOP_SERIES_LIMIT = MODEL_COLORS.length;
 export const OTHER_SERIES_KEY = "__other__";
-export const OTHER_SERIES_LABEL = "Other";
 export const OTHER_SERIES_COLOR = "var(--chart-cat-other)";
-
-export const UNNAMED_MODEL_LABEL = "(unnamed)";
 
 // Resolves a raw model value to its display label: the canonical model name
 // when one is known (e.g. Bedrock inference-profile IDs mapped via key
 // aliases), the raw value otherwise.
 export function displayModelLabel(model: string, labels?: Record<string, string>): string {
-	if (model === OTHER_SERIES_KEY) return OTHER_SERIES_LABEL;
-	if (model === "") return UNNAMED_MODEL_LABEL;
+	if (model === OTHER_SERIES_KEY) return i18n.t("dashboard.common.other", "Other");
+	if (model === "") return i18n.t("dashboard.common.unnamed", "(unnamed)");
 	return labels?.[model] ?? model;
 }
 
