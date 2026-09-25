@@ -5,9 +5,11 @@ import { getErrorMessage, useGetCoreConfigQuery, useUpdateCoreConfigMutation } f
 import { CompatConfig, DefaultCoreConfig } from "@/lib/types/config";
 import { RbacOperation, RbacResource, useRbac } from "@enterprise/lib";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 export default function CompatibilityView() {
+	const { t } = useTranslation();
 	const hasSettingsUpdateAccess = useRbac(RbacResource.Settings, RbacOperation.Update);
 	const { data: bifrostConfig } = useGetCoreConfigQuery({ fromDB: true });
 	const config = bifrostConfig?.client_config?.compat;
@@ -39,7 +41,7 @@ export default function CompatibilityView() {
 
 	const handleSave = useCallback(async () => {
 		if (!bifrostConfig) {
-			toast.error("Configuration not loaded");
+			toast.error(t("settings.compatibility.configNotLoaded", "Configuration not loaded"));
 			return;
 		}
 
@@ -51,16 +53,16 @@ export default function CompatibilityView() {
 					compat: localCompatConfig,
 				},
 			}).unwrap();
-			toast.success("Compatibility settings updated successfully.");
+			toast.success(t("settings.compatibility.updatedSuccess", "Compatibility settings updated successfully."));
 		} catch (error) {
 			toast.error(getErrorMessage(error));
 		}
-	}, [bifrostConfig, localCompatConfig, updateCoreConfig]);
+	}, [bifrostConfig, localCompatConfig, t, updateCoreConfig]);
 
 	return (
 		<div className="mx-auto w-full max-w-4xl space-y-6">
-			<PageTitle title="Compatibility">
-				Configure request conversions and compatibility fallbacks.{" "}
+			<PageTitle title={t("settings.compatibility.title", "Compatibility")}>
+				{t("settings.compatibility.description", "Configure request conversions and compatibility fallbacks.")}{" "}
 				<a
 					className="text-primary underline"
 					href="https://docs.getbifrost.ai/features/compat-plugin"
@@ -68,7 +70,7 @@ export default function CompatibilityView() {
 					rel="noopener noreferrer"
 					data-testid="litellm-docs-link"
 				>
-					Learn more
+					{t("settings.compatibility.learnMore", "Learn more")}
 				</a>
 			</PageTitle>
 
@@ -76,9 +78,14 @@ export default function CompatibilityView() {
 				<div className="flex items-center justify-between space-x-2">
 					<div className="space-y-0.5">
 						<label htmlFor="compat-convert-text-to-chat" className="text-sm font-medium">
-							Convert Text to Chat
+							{t("settings.compatibility.convertTextToChat", "Convert Text to Chat")}
 						</label>
-						<p className="text-muted-foreground text-sm">Convert text completion requests to chat for models that only support chat.</p>
+						<p className="text-muted-foreground text-sm">
+							{t(
+								"settings.compatibility.convertTextToChatDescription",
+								"Convert text completion requests to chat for models that only support chat.",
+							)}
+						</p>
 					</div>
 					<Switch
 						id="compat-convert-text-to-chat"
@@ -93,10 +100,13 @@ export default function CompatibilityView() {
 				<div className="flex items-center justify-between space-x-2">
 					<div className="space-y-0.5">
 						<label htmlFor="compat-convert-chat-to-responses" className="text-sm font-medium">
-							Convert Chat to Responses
+							{t("settings.compatibility.convertChatToResponses", "Convert Chat to Responses")}
 						</label>
 						<p className="text-muted-foreground text-sm">
-							Convert chat completion requests to responses for models that only support responses.
+							{t(
+								"settings.compatibility.convertChatToResponsesDescription",
+								"Convert chat completion requests to responses for models that only support responses.",
+							)}
 						</p>
 					</div>
 					<Switch
@@ -112,9 +122,14 @@ export default function CompatibilityView() {
 				<div className="flex items-center justify-between space-x-2">
 					<div className="space-y-0.5">
 						<label htmlFor="compat-should-drop-params" className="text-sm font-medium">
-							Drop Unsupported Params
+							{t("settings.compatibility.dropUnsupportedParams", "Drop Unsupported Params")}
 						</label>
-						<p className="text-muted-foreground text-sm">Drop unsupported parameters based on model catalog allowlist.</p>
+						<p className="text-muted-foreground text-sm">
+							{t(
+								"settings.compatibility.dropUnsupportedParamsDescription",
+								"Drop unsupported parameters based on model catalog allowlist.",
+							)}
+						</p>
 					</div>
 					<Switch
 						id="compat-should-drop-params"
@@ -129,9 +144,14 @@ export default function CompatibilityView() {
 				<div className="flex items-center justify-between space-x-2">
 					<div className="space-y-0.5">
 						<label htmlFor="compat-should-convert-params" className="text-sm font-medium">
-							Convert Unsupported Param Values
+							{t("settings.compatibility.convertUnsupportedParamValues", "Convert Unsupported Param Values")}
 						</label>
-						<p className="text-muted-foreground text-sm">Converts model parameter values that are not supported by the model.</p>
+						<p className="text-muted-foreground text-sm">
+							{t(
+								"settings.compatibility.convertUnsupportedParamValuesDescription",
+								"Converts model parameter values that are not supported by the model.",
+							)}
+						</p>
 					</div>
 					<Switch
 						id="compat-should-convert-params"
@@ -146,10 +166,13 @@ export default function CompatibilityView() {
 				<div className="flex items-center justify-between space-x-2">
 					<div className="space-y-0.5">
 						<label htmlFor="compat-azure-deepseek" className="text-sm font-medium">
-							Use Chat Completion APIs for Azure Deepseek models
+							{t("settings.compatibility.azureDeepseek", "Use Chat Completion APIs for Azure Deepseek models")}
 						</label>
 						<p className="text-muted-foreground text-sm">
-							Use Chat Completion APIs for Claude Code, Codex, etc. for Azure Deepseek models.
+							{t(
+								"settings.compatibility.azureDeepseekDescription",
+								"Use Chat Completion APIs for Claude Code, Codex, etc. for Azure Deepseek models.",
+							)}
 						</p>
 					</div>
 					<Switch
@@ -165,7 +188,7 @@ export default function CompatibilityView() {
 
 			<div className="flex justify-end pt-2">
 				<Button onClick={handleSave} disabled={!hasChanges || isLoading || !hasSettingsUpdateAccess} data-testid="compat-save-button">
-					{isLoading ? "Saving..." : "Save Changes"}
+					{isLoading ? t("settings.common.saving", "Saving...") : t("settings.compatibility.saveChanges", "Save Changes")}
 				</Button>
 			</div>
 		</div>
