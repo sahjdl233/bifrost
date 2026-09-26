@@ -17,6 +17,7 @@ import type { ColumnOrderState, ColumnPinningState, TableMeta, VisibilityState }
 import { ColumnDef, flexRender, getCoreRowModel, SortingState, useReactTable } from "@tanstack/react-table";
 import { ChevronLeft, ChevronRight, Loader2, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 // Fixed content height for every body cell: 32px here plus the cell's py-1.5
 // makes every body row exactly 44px, whatever it holds. It is a single-column
@@ -67,6 +68,7 @@ export function LogsDataTable({
 	tableMeta,
 }: DataTableProps) {
 	const [sorting, setSorting] = useState<SortingState>([{ id: pagination.sort_by, desc: pagination.order === "desc" }]);
+	const { t } = useTranslation();
 	const [pageSizePref, setPageSizePref, pageSizeHydrated] = useTablePageSizePreference("bifrost.logs.pageSize");
 
 	const fixedColumnIds = useMemo(() => new Set<string>(["expand", "actions"]), []);
@@ -211,7 +213,7 @@ export function LogsDataTable({
 									{loading ? (
 										<>
 											<RefreshCw className="h-4 w-4 animate-spin" />
-											Loading logs...
+									{t("logs.table.loading", "Loading logs...")}
 										</>
 									) : polling ? (
 										<>
@@ -300,7 +302,7 @@ export function LogsDataTable({
 						) : loading ? null : (
 							<TableRow>
 								<TableCell colSpan={columns.length} className="h-24 text-center">
-									No results found. Try adjusting your filters and/or time range.
+									{t("logs.table.noResults", "No results found. Try adjusting your filters and/or time range.")}
 								</TableCell>
 							</TableRow>
 						)}
@@ -311,12 +313,16 @@ export function LogsDataTable({
 			{/* Pagination Footer */}
 			<div className="flex shrink-0 items-center justify-between text-xs" data-testid="pagination">
 				<div className="text-muted-foreground flex items-center gap-2">
-					{startItem.toLocaleString()}-{endItem.toLocaleString()} of {totalItems.toLocaleString()} entries
+					{t("logs.table.entriesSummary", "{{start}}-{{end}} of {{total}} entries", {
+						start: startItem.toLocaleString(),
+						end: endItem.toLocaleString(),
+						total: totalItems.toLocaleString(),
+					})}
 				</div>
 
 				<div className="flex items-center gap-3">
 					<div className="flex items-center gap-1.5">
-						<span className="text-muted-foreground">Rows per page</span>
+						<span className="text-muted-foreground">{t("logs.table.rowsPerPage", "Rows per page")}</span>
 						<ComboboxSelect
 							options={pageSizeOptions}
 							value={String(pageSizePref)}
@@ -335,15 +341,15 @@ export function LogsDataTable({
 							onClick={() => goToPage(currentPage - 1)}
 							disabled={currentPage <= 1}
 							data-testid="prev-page"
-							aria-label="Previous page"
+							aria-label={t("logs.table.previousPage", "Previous page")}
 						>
 							<ChevronLeft className="size-3" />
 						</Button>
 
 						<div className="flex items-center gap-1">
-							<span>Page</span>
+							<span>{t("logs.table.page", "Page")}</span>
 							<span>{currentPage}</span>
-							<span>of {totalPages}</span>
+							<span>{t("logs.table.of", "of {{total}}", { total: totalPages })}</span>
 						</div>
 
 						<Button
@@ -352,7 +358,7 @@ export function LogsDataTable({
 							onClick={() => goToPage(currentPage + 1)}
 							disabled={totalPages === 0 || currentPage >= totalPages}
 							data-testid="next-page"
-							aria-label="Next page"
+							aria-label={t("logs.table.nextPage", "Next page")}
 						>
 							<ChevronRight className="size-3" />
 						</Button>

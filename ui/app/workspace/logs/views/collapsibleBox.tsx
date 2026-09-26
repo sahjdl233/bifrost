@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface CollapsibleBoxProps {
 	title: string;
@@ -16,6 +17,7 @@ export default function CollapsibleBox({ title, children, collapsedHeight = 60, 
 	const [needsExpansion, setNeedsExpansion] = useState(false);
 	const innerContentRef = useRef<HTMLDivElement>(null);
 	const { copy } = useCopyToClipboard();
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		if (!innerContentRef.current) return;
@@ -53,6 +55,7 @@ export default function CollapsibleBox({ title, children, collapsedHeight = 60, 
 						size="sm"
 						className="text-muted-foreground mx-2 h-6 py-1 hover:bg-transparent hover:text-black dark:hover:text-white"
 						onClick={handleCopy}
+						aria-label={t("logs.common.copy", "Copy")}
 					>
 						<Copy className="h-3 w-3" />
 					</Button>
@@ -72,12 +75,12 @@ export default function CollapsibleBox({ title, children, collapsedHeight = 60, 
 					{isExpanded ? (
 						<>
 							<ChevronUp className="h-3 w-3" />
-							show less
+							{t("logs.common.showLess", "show less")}
 						</>
 					) : (
 						<>
 							<ChevronDown className="h-3 w-3" />
-							show more
+							{t("logs.common.showMore", "show more")}
 						</>
 					)}
 				</button>

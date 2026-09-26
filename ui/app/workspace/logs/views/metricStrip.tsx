@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { COMPACT_NUMBER_FORMAT, formatCurrencyNumber } from "@/lib/utils/numbers";
 import NumberFlow from "@number-flow/react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Line, LineChart, XAxis, YAxis } from "recharts";
 import {
 	buildSparkPoints,
@@ -234,6 +235,7 @@ function Segment({
 	footer: React.ReactNode;
 	state?: MetricsState;
 }) {
+	const { t } = useTranslation();
 	// The footer is derived from the same figures as the value - sparklines,
 	// meters and change-vs-previous chips all read the stats that are missing -
 	// so it goes with them rather than rendering a flat line beside an "N/A".
@@ -256,7 +258,7 @@ function Segment({
 					"[--number-flow-mask-height:0.15em]",
 					ready ? value : muted,
 				)}
-				title={state === "unavailable" ? "These statistics could not be loaded" : undefined}
+				title={state === "unavailable" ? t("logs.metrics.statsUnavailable", "These statistics could not be loaded") : undefined}
 			>
 				{ready ? children : placeholder[state]}
 			</div>
@@ -317,6 +319,7 @@ interface MetricStripProps {
  * receives, so the interactivity costs no extra request.
  */
 export function MetricStrip({ stats, requestHistogram, latencyHistogram, costHistogram, loading, error }: MetricStripProps) {
+	const { t } = useTranslation();
 	// Every readout below falls back to 0 when stats is undefined, so without this
 	// a failed request renders as a genuinely empty window.
 	const state = metricsState(stats, loading ?? false, error);
@@ -390,7 +393,7 @@ export function MetricStrip({ stats, requestHistogram, latencyHistogram, costHis
 		>
 			<Segment
 				state={state}
-				title="Total Requests"
+				title={t("logs.metrics.totalRequests", "Total Requests")}
 				footer={
 					<>
 						<Sparkline
@@ -399,9 +402,9 @@ export function MetricStrip({ stats, requestHistogram, latencyHistogram, costHis
 							className={toneClass[requestsSignal.tone]}
 							rows={(point, index) => (
 								<>
-									<TooltipRow name="Requests">{averaged(point, formatCount(point.value))}</TooltipRow>
+									<TooltipRow name={t("logs.metrics.requests", "Requests")}>{averaged(point, formatCount(point.value))}</TooltipRow>
 									{errorPoints[index] && errorPoints[index].value > 0 && (
-										<TooltipRow name="Failed" className={negative}>
+										<TooltipRow name={t("logs.metrics.failed", "Failed")} className={negative}>
 											{averaged(point, formatCount(errorPoints[index].value))}
 										</TooltipRow>
 									)}
@@ -417,21 +420,21 @@ export function MetricStrip({ stats, requestHistogram, latencyHistogram, costHis
 
 			<Segment
 				state={state}
-				title="Success Rate"
+				title={t("logs.metrics.successRate", "Success Rate")}
 				footer={
 					<>
 						<RatioBar
 							percent={successRate}
 							tooltip={
-								<TooltipBody heading="Of all requests in this window">
-									<TooltipRow name="Succeeded" className={positive}>
+								<TooltipBody heading={t("logs.metrics.allRequestsInWindow", "Of all requests in this window")}>
+									<TooltipRow name={t("logs.metrics.succeeded", "Succeeded")} className={positive}>
 										{formatCount(success.passed)}
 									</TooltipRow>
-									<TooltipRow name="Failed" className={negative}>
+									<TooltipRow name={t("logs.metrics.failed", "Failed")} className={negative}>
 										{formatCount(success.failed)}
 									</TooltipRow>
-									<TooltipRow name="Total">{formatCount(totalRequests)}</TooltipRow>
-									{previous && <TooltipRow name="Previous period">{`${previous.success_rate.toFixed(2)}%`}</TooltipRow>}
+									<TooltipRow name={t("logs.metrics.total", "Total")}>{formatCount(totalRequests)}</TooltipRow>
+									{previous && <TooltipRow name={t("logs.metrics.previousPeriod", "Previous period")}>{`${previous.success_rate.toFixed(2)}%`}</TooltipRow>}
 								</TooltipBody>
 							}
 						/>
@@ -445,21 +448,21 @@ export function MetricStrip({ stats, requestHistogram, latencyHistogram, costHis
 
 			<Segment
 				state={state}
-				title="User Success"
+				title={t("logs.metrics.userSuccess", "User Success")}
 				footer={
 					<>
 						<RatioBar
 							percent={userSuccessRate}
 							tooltip={
-								<TooltipBody heading="Of user-facing requests only">
-									<TooltipRow name="Succeeded" className={positive}>
+								<TooltipBody heading={t("logs.metrics.userFacingOnly", "Of user-facing requests only")}>
+									<TooltipRow name={t("logs.metrics.succeeded", "Succeeded")} className={positive}>
 										{formatCount(userSuccess.passed)}
 									</TooltipRow>
-									<TooltipRow name="Failed" className={negative}>
+									<TooltipRow name={t("logs.metrics.failed", "Failed")} className={negative}>
 										{formatCount(userSuccess.failed)}
 									</TooltipRow>
-									<TooltipRow name="Total">{formatCount(userRequests)}</TooltipRow>
-									{previous && <TooltipRow name="Previous period">{`${previous.user_facing_success_rate.toFixed(2)}%`}</TooltipRow>}
+									<TooltipRow name={t("logs.metrics.total", "Total")}>{formatCount(userRequests)}</TooltipRow>
+									{previous && <TooltipRow name={t("logs.metrics.previousPeriod", "Previous period")}>{`${previous.user_facing_success_rate.toFixed(2)}%`}</TooltipRow>}
 								</TooltipBody>
 							}
 						/>
@@ -473,7 +476,7 @@ export function MetricStrip({ stats, requestHistogram, latencyHistogram, costHis
 
 			<Segment
 				state={state}
-				title="Avg Latency"
+				title={t("logs.metrics.avgLatency", "Avg Latency")}
 				footer={
 					<>
 						<Sparkline
@@ -482,7 +485,7 @@ export function MetricStrip({ stats, requestHistogram, latencyHistogram, costHis
 							className={warning}
 							rows={(point, index) => (
 								<>
-									<TooltipRow name="Average">{averaged(point, formatMs(point.value))}</TooltipRow>
+									<TooltipRow name={t("logs.metrics.average", "Average")}>{averaged(point, formatMs(point.value))}</TooltipRow>
 									{latencyP95Points[index] && (
 										<TooltipRow name="p95">{averaged(point, formatMs(latencyP95Points[index].value))}</TooltipRow>
 									)}
@@ -501,21 +504,21 @@ export function MetricStrip({ stats, requestHistogram, latencyHistogram, costHis
 
 			<Segment
 				state={state}
-				title="Total Tokens"
+				title={t("logs.metrics.totalTokens", "Total Tokens")}
 				footer={
 					<>
 						<StackedBar
 							first={promptTokens}
 							second={completionTokens}
 							tooltip={
-								<TooltipBody heading="Token split">
-									<TooltipRow name="Input" className="text-chart-token-input">
+								<TooltipBody heading={t("logs.metrics.tokenSplit", "Token split")}>
+									<TooltipRow name={t("logs.metrics.input", "Input")} className="text-chart-token-input">
 										{`${formatCount(promptTokens)}${tokenTotal > 0 ? ` (${((promptTokens / tokenTotal) * 100).toFixed(1)}%)` : ""}`}
 									</TooltipRow>
-									<TooltipRow name="Output" className="text-chart-token-output">
+									<TooltipRow name={t("logs.metrics.output", "Output")} className="text-chart-token-output">
 										{`${formatCount(completionTokens)}${tokenTotal > 0 ? ` (${((completionTokens / tokenTotal) * 100).toFixed(1)}%)` : ""}`}
 									</TooltipRow>
-									<TooltipRow name="Total">{formatCount(stats?.total_tokens ?? 0)}</TooltipRow>
+									<TooltipRow name={t("logs.metrics.total", "Total")}>{formatCount(stats?.total_tokens ?? 0)}</TooltipRow>
 								</TooltipBody>
 							}
 						/>
@@ -534,19 +537,19 @@ export function MetricStrip({ stats, requestHistogram, latencyHistogram, costHis
 
 			<Segment
 				state={state}
-				title="Total Cost"
+				title={t("logs.metrics.totalCost", "Total Cost")}
 				footer={
 					<>
 						<Sparkline
 							points={costPoints}
 							bucketSizeSeconds={costHistogram?.bucket_size_seconds}
 							className={costChange ? toneClass[costChange.tone] : muted}
-							rows={(point) => <TooltipRow name="Cost">{averaged(point, formatCurrencyNumber(point.value))}</TooltipRow>}
+							rows={(point) => <TooltipRow name={t("logs.metrics.cost", "Cost")}>{averaged(point, formatCurrencyNumber(point.value))}</TooltipRow>}
 						/>
 						{costChange?.text ? (
 							<Trailing className={toneClass[costChange.tone]}>{costChange.text}</Trailing>
 						) : (
-							costPerRequest > 0 && <Trailing className={muted}>{formatCurrencyNumber(costPerRequest)}/req</Trailing>
+							costPerRequest > 0 && <Trailing className={muted}>{formatCurrencyNumber(costPerRequest)}{t("logs.metrics.perRequest", "/req")}</Trailing>
 						)}
 					</>
 				}
