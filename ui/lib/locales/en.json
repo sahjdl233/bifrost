@@ -1,3 +1,4 @@
+@ -1,1774 +1,15 @@
 {
 	"common": {
 		"language": "Language",
@@ -1771,4 +1772,16 @@
 			"virtualKeys": "Virtual Keys"
 		}
 	}
+  "logs": {
+    "detail": {
+      "viewDetails": "View details",
+      "measuredSpans": "Measured spans (...)",
+      "directCache": "Direct Cache",
+      "semanticCache": "Semantic Cache",
+      "largePayload": "Large Payload",
+      "costDisclaimer": "Priced with no published rate, or from dimensions the provider never confirmed, so this cost may be short.",
+      "pluginLogs": "Plugin Logs",
+      "rawJson": "Raw JSON"
+    }
+  }
 }

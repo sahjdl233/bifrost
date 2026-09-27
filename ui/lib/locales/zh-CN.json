@@ -1771,4 +1771,16 @@
 			"virtualKeys": "虚拟密钥"
 		}
 	}
+	"logs": {
+    "detail": {
+      "viewDetails": "查看详情",
+      "measuredSpans": "测量的跨度 (...)",
+      "directCache": "直接缓存",
+      "semanticCache": "语义缓存",
+      "largePayload": "大载荷",
+      "costDisclaimer": "由于未公布费率或提供商未确认的维度，此成本可能被低估。",
+      "pluginLogs": "插件日志",
+      "rawJson": "原始 JSON"
+    }
+  }
 }
