@@ -781,7 +781,7 @@ function OverheadBreakdown({ buckets, overheadMs }: { buckets: OverheadBucket[];
 					onClick={() => setShowDetails((v) => !v)}
 					className="text-muted-foreground hover:text-foreground flex items-center gap-1 font-mono text-[11px] transition"
 				>
-					View details
+					{t("logs.detail.viewDetails", "View details")}
 					<ChevronDown className={cn("h-3 w-3 transition-transform", showDetails ? "rotate-180" : "rotate-0")} />
 				</button>
 			) : null}
@@ -813,8 +813,10 @@ function OverheadBreakdown({ buckets, overheadMs }: { buckets: OverheadBucket[];
 
 			{overCounted ? (
 				<div className="text-muted-foreground text-[11px]">
-					Measured spans ({formatMicros(sumUs)}) exceed the computed overhead ({formatMicros(overheadUs!)}); the upstream accumulator may be
-					over-counting.
+					{t("logs.detail.measuredSpansExceedOverhead", "Measured spans ({{measured}}) exceed the computed overhead ({{overhead}}); the upstream accumulator may be over-counting.", {
+						measured: formatMicros(sumUs),
+						overhead: formatMicros(overheadUs!),
+					})}
 				</div>
 			) : null}
 		</div>
@@ -1019,7 +1021,8 @@ function CollapsibleCode({ text, preview = 3, lang, mono = true }: { text: strin
 						<ChevronDown className={cn("h-3 w-3 transition-transform", open && "rotate-180")} />
 					</button>
 					<span className="text-muted-foreground font-mono text-[10.5px]">
-						{lines.length} lines{lang ? ` · ${lang}` : ""}
+						{t("logs.detail.codeLineCount", "{{count}} lines", { count: lines.length })}
+						{lang ? ` · ${lang}` : ""}
 					</span>
 				</div>
 			)}
@@ -1554,13 +1557,13 @@ export function LogDetailView({
 									data-testid="logdetails-header-routing-rule-link"
 								>
 									<Badge variant="outline" className="bg-card text-muted-foreground rounded-sm px-2 py-0.5 font-normal hover:underline">
-										rule: {log.routing_rule.name}
+										{t("logs.detail.headerRulePrefix", "rule:")} {log.routing_rule.name}
 									</Badge>
 								</Link>
 							)}
 							{log.metadata?.isAsyncRequest ? (
 								<Badge variant="outline" className="rounded-sm bg-teal-100 px-2 py-0.5 text-teal-800 dark:bg-teal-900 dark:text-teal-200">
-									Async
+									{t("logs.detail.headerAsync", "Async")}
 								</Badge>
 							) : null}
 							{log.cache_debug?.hit_type === "direct" ? (
@@ -1568,12 +1571,12 @@ export function LogDetailView({
 									variant="outline"
 									className="rounded-sm bg-indigo-100 px-2 py-0.5 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200"
 								>
-									Direct Cache
+									{t("logs.detail.headerDirectCache", "Direct Cache")}
 								</Badge>
 							) : null}
 							{log.cache_debug?.hit_type === "semantic" ? (
 								<Badge variant="outline" className="rounded-sm bg-rose-100 px-2 py-0.5 text-rose-800 dark:bg-rose-900 dark:text-rose-200">
-									Semantic Cache
+									{t("logs.detail.headerSemanticCache", "Semantic Cache")}
 								</Badge>
 							) : null}
 							{(log.is_large_payload_request || log.is_large_payload_response) && (
@@ -1581,7 +1584,7 @@ export function LogDetailView({
 									variant="outline"
 									className="rounded-sm border-amber-300 bg-amber-50 px-2 py-0.5 text-amber-700 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-400"
 								>
-									Large Payload
+									{t("logs.detail.headerLargePayload", "Large Payload")}
 								</Badge>
 							)}
 							{isRealtimeTurn && log.metadata?.realtime_transport && (
@@ -1624,14 +1627,16 @@ export function LogDetailView({
 							)}
 						</div>
 						<div className="mt-3 flex items-center gap-2">
-							<div className="text-muted-foreground w-24 shrink-0 text-[10.5px] font-semibold tracking-wider uppercase">Request</div>
+							<div className="text-muted-foreground w-24 shrink-0 text-[10.5px] font-semibold tracking-wider uppercase">{t("logs.detail.headerRequestId", "Request")}</div>
 							<code className="text-foreground truncate font-mono text-[13px]">{log.id || "—"}</code>
 							{log.id ? <CopyInlineButton text={log.id} testId="logdetails-copy-request-id-button" /> : null}
 						</div>
 						{log.cache_debug?.cache_id && (
 							<div className="mt-1 flex items-center gap-2">
 								<div className="text-muted-foreground w-24 shrink-0 text-[10.5px] font-semibold tracking-wider uppercase">
-									Cache {log.cache_debug.cache_hit ? "(hit)" : "(miss)"}
+									{log.cache_debug.cache_hit
+										? t("logs.detail.headerCacheHit", "Cache (hit)")
+										: t("logs.detail.headerCacheMiss", "Cache (miss)")}
 								</div>
 								<code className="text-foreground truncate font-mono text-[13px]">{log.cache_debug.cache_id}</code>
 								<CopyInlineButton text={log.cache_debug.cache_id} testId="logdetails-copy-cache-id-button" />
@@ -1639,7 +1644,7 @@ export function LogDetailView({
 						)}
 						{log.routing_rule && (
 							<div className="mt-1 flex items-center gap-2">
-								<div className="text-muted-foreground w-24 shrink-0 text-[10.5px] font-semibold tracking-wider uppercase">Rule</div>
+								<div className="text-muted-foreground w-24 shrink-0 text-[10.5px] font-semibold tracking-wider uppercase">{t("logs.detail.headerRule", "Rule")}</div>
 								<Link
 									to="/workspace/logs"
 									search={(prev) => ({ ...prev, offset: 0, selected_log: "", routing_rule_ids: [log.routing_rule!.id] })}
@@ -1652,7 +1657,7 @@ export function LogDetailView({
 						)}
 						{log.selected_key && (
 							<div className="mt-1 flex items-center gap-2">
-								<div className="text-muted-foreground w-24 shrink-0 text-[10.5px] font-semibold tracking-wider uppercase">Key</div>
+								<div className="text-muted-foreground w-24 shrink-0 text-[10.5px] font-semibold tracking-wider uppercase">{t("logs.detail.headerSelectedKey", "Key")}</div>
 								<Link
 									to="/workspace/logs"
 									search={(prev) => ({ ...prev, offset: 0, selected_log: "", selected_key_ids: [log.selected_key_id] })}
@@ -1693,7 +1698,7 @@ export function LogDetailView({
 						hasRightBorder
 					/>
 					<HeroStat
-						label={audioSeconds != null ? "Audio duration" : "Tokens in / out"}
+						label={audioSeconds != null ? t("logs.detail.audioDuration", "Audio duration") : t("logs.detail.tokensInOut", "Tokens in / out")}
 						mono
 						value={
 							audioSeconds != null
@@ -1754,9 +1759,9 @@ export function LogDetailView({
 			</div>
 			<details className="group bg-card rounded-sm border" open={false}>
 				<summary className="hover:bg-muted/30 flex cursor-pointer items-center justify-between px-4 py-2.5 text-sm transition">
-					<span className="text-foreground font-medium">More details</span>
+					<span className="text-foreground font-medium">{t("logs.detail.moreDetails", "More details")}</span>
 					<span className="text-muted-foreground flex items-center gap-2 text-xs">
-						<span className="hidden md:inline">timings, request meta, tokens, caching, metadata</span>
+						<span className="hidden md:inline">{t("logs.detail.moreDetailsHint", "timings, request meta, tokens, caching, metadata")}</span>
 						<ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
 					</span>
 				</summary>
@@ -1783,19 +1788,19 @@ export function LogDetailView({
 							<LogEntryDetailsView
 								className="w-full"
 								label={t("logs.detail.latency", "Latency")}
-								tooltip="Total end-to-end request time: upstream plus Bifrost overhead."
+								tooltip={t("logs.detail.tooltipLatency", "Total end-to-end request time: upstream plus Bifrost overhead.")}
 								value={log.latency == null || isNaN(log.latency) ? "N/A" : <div>{log.latency.toFixed(2)}ms</div>}
 							/>
 							<LogEntryDetailsView
 								className="w-full"
 								label={t("logs.detail.upstreamLatency", "Upstream Latency")}
-								tooltip="Time spent waiting on the provider, summed across every attempt."
+								tooltip={t("logs.detail.tooltipUpstreamLatency", "Time spent waiting on the provider, summed across every attempt.")}
 								value={log.upstream_latency == null || isNaN(log.upstream_latency) ? "N/A" : <div>{log.upstream_latency.toFixed(2)}ms</div>}
 							/>
 							<LogEntryDetailsView
 								className="w-full"
 								label={t("logs.detail.bifrostOverhead", "Bifrost Overhead")}
-								tooltip="Time added by Bifrost itself: routing, plugins, and processing."
+								tooltip={t("logs.detail.tooltipBifrostOverhead", "Time added by Bifrost itself: routing, plugins, and processing.")}
 								value={log.overhead_latency == null || isNaN(log.overhead_latency) ? "N/A" : <div>{log.overhead_latency.toFixed(2)}ms</div>}
 							/>
 						</div>
@@ -1910,7 +1915,7 @@ export function LogDetailView({
 													</code>
 												</TooltipTrigger>
 												<TooltipContent sideOffset={6} className="max-w-md break-all">
-													{log.parent_request_id} · Filter this session
+													{log.parent_request_id} · {t("logs.detail.filterThisSession", "Filter this session")}
 												</TooltipContent>
 											</Tooltip>
 										) : (
@@ -1938,7 +1943,7 @@ export function LogDetailView({
 													</button>
 												</TooltipTrigger>
 												<TooltipContent sideOffset={6} className="max-w-md break-all">
-													{log.session_id} · Filter this session
+												{log.session_id} · {t("logs.detail.filterThisSession", "Filter this session")}
 												</TooltipContent>
 											</Tooltip>
 										) : (
@@ -1990,7 +1995,7 @@ export function LogDetailView({
 							{(log.team_ids?.length || log.team_id) && (
 								<LogEntryDetailsView
 									className="w-full"
-									label={(log.team_ids?.length ?? 0) > 1 ? "Teams" : "Team"}
+									label={(log.team_ids?.length ?? 0) > 1 ? t("logs.detail.teams", "Teams") : t("logs.detail.team", "Team")}
 									value={
 										<span className="inline-flex flex-wrap gap-x-1">
 											{(log.team_ids?.length
@@ -2015,7 +2020,7 @@ export function LogDetailView({
 							{(log.customer_ids?.length || log.customer_id) && (
 								<LogEntryDetailsView
 									className="w-full"
-									label={(log.customer_ids?.length ?? 0) > 1 ? "Customers" : "Customer"}
+									label={(log.customer_ids?.length ?? 0) > 1 ? t("logs.detail.customers", "Customers") : t("logs.detail.customer", "Customer")}
 									value={
 										<span className="inline-flex flex-wrap gap-x-1">
 											{(log.customer_ids?.length
@@ -2040,7 +2045,7 @@ export function LogDetailView({
 							{(log.business_unit_ids?.length || log.business_unit_id) && (
 								<LogEntryDetailsView
 									className="w-full"
-									label={(log.business_unit_ids?.length ?? 0) > 1 ? "Business Units" : "Business Unit"}
+									label={(log.business_unit_ids?.length ?? 0) > 1 ? t("logs.detail.businessUnits", "Business Units") : t("logs.detail.businessUnit", "Business Unit")}
 									value={
 										<span className="inline-flex flex-wrap gap-x-1">
 											{(log.business_unit_ids?.length
@@ -2568,7 +2573,7 @@ export function LogDetailView({
 										)}
 										{videoAccounting?.incomplete && (
 											<p className="text-muted-foreground text-xs">
-												Priced with no published rate, or from dimensions the provider never confirmed, so this cost may be short.
+											{t("logs.detail.costUnconfirmedDisclaimer", "Priced with no published rate, or from dimensions the provider never confirmed, so this cost may be short.")}
 											</p>
 										)}
 									</div>
@@ -2684,7 +2689,7 @@ export function LogDetailView({
 													label={t("logs.detail.action", "Action")}
 													value={
 														<Badge variant={call.action === "GUARDRAIL_INTERVENED" ? "destructive" : "success"}>
-															{call.action === "GUARDRAIL_INTERVENED" ? "Blocked" : "Allowed"}
+											{call.action === "GUARDRAIL_INTERVENED" ? t("logs.detail.blocked", "Blocked") : t("logs.detail.allowed", "Allowed")}
 														</Badge>
 													}
 												/>
@@ -2817,7 +2822,7 @@ export function LogDetailView({
 				<TabsList className="bg-muted/60 h-10 w-fit">
 					{showBatchDetailsTab && (
 						<TabsTrigger value="details" className="px-3">
-							Details
+								{t("logs.detail.tabDetails", "Details")}
 							{batchInlineRequests.length + batchResultItems.length ? (
 								<span className="bg-background text-muted-foreground ml-1.5 rounded-sm border px-2 py-0.5 text-[10px] tabular-nums">
 									{batchInlineRequests.length + batchResultItems.length}
@@ -2827,7 +2832,7 @@ export function LogDetailView({
 					)}
 					{showTabs && !isBatch && (
 						<TabsTrigger value="messages" className="px-3">
-							Messages
+								{t("logs.detail.tabMessages", "Messages")}
 							{log.input_history?.length ? (
 								<span className="bg-background text-muted-foreground ml-1.5 rounded-sm border px-2 py-0.5 text-[10px] tabular-nums">
 									{log.input_history.length + (log.output_message ? 1 : 0)}
@@ -2838,7 +2843,7 @@ export function LogDetailView({
 
 					{showTabs && !isPassthrough && !log.list_models_output && !isBatch && (
 						<TabsTrigger value="tools" className="px-3">
-							Tools
+								{t("logs.detail.tabTools", "Tools")}
 							{declaredTools.length ? (
 								<span className="bg-background text-muted-foreground ml-1.5 rounded-sm border px-2 py-0.5 text-[10px] tabular-nums">
 									{declaredTools.length}
@@ -2848,7 +2853,7 @@ export function LogDetailView({
 					)}
 					{showTabs && (
 						<TabsTrigger value="routing" className="px-3">
-							Routing
+								{t("logs.detail.tabRouting", "Routing")}
 							{log.routing_engine_logs ? (
 								<span className="bg-background text-muted-foreground ml-1.5 rounded-sm border px-2 py-0.5 text-[10px] tabular-nums">
 									{log.routing_engine_logs.split("\n").filter(Boolean).length}
@@ -2857,7 +2862,7 @@ export function LogDetailView({
 						</TabsTrigger>
 					)}
 					<TabsTrigger value="plugins" className="px-3">
-						Plugin Logs
+						{t("logs.detail.tabPluginLogs", "Plugin Logs")}
 						{pluginLogCount > 0 ? (
 							<span className="bg-background text-muted-foreground ml-1.5 rounded-sm border px-2 py-0.5 text-[10px] tabular-nums">
 								{pluginLogCount}
@@ -2866,7 +2871,7 @@ export function LogDetailView({
 					</TabsTrigger>
 					{!isPassthrough && (
 						<TabsTrigger value="raw" className="px-3">
-							Raw JSON
+							{t("logs.detail.tabRawJson", "Raw JSON")}
 						</TabsTrigger>
 					)}
 				</TabsList>
@@ -2919,7 +2924,7 @@ export function LogDetailView({
 							{batchInlineRequests.length > 0 ? (
 								<div className="px-5 pt-5 pb-2">
 									<div className="text-muted-foreground mb-1 text-[10.5px] font-semibold tracking-wider uppercase">
-										Batch Requests ({batchInlineRequests.length})
+										{t("logs.detail.batchRequests", "Batch Requests ({{count}})", { count: batchInlineRequests.length })}
 									</div>
 									<Accordion type="multiple" className="w-full">
 										{batchInlineRequests.map((request, index) => (
@@ -2933,7 +2938,9 @@ export function LogDetailView({
 															</Badge>
 														)}
 														<span className="text-muted-foreground text-[11px]">
-															{request.messages.length} message{request.messages.length === 1 ? "" : "s"}
+												{request.messages.length === 1
+													? t("logs.detail.messageCountOne", "{{count}} message", { count: request.messages.length })
+													: t("logs.detail.messageCountMany", "{{count}} messages", { count: request.messages.length })}
 														</span>
 													</span>
 												</AccordionTrigger>
@@ -2946,7 +2953,7 @@ export function LogDetailView({
 																{text ? (
 																	<CollapsibleCode text={text} preview={3} mono={false} />
 																) : (
-																	<span className="text-muted-foreground text-xs">Empty message</span>
+																	<span className="text-muted-foreground text-xs">{t("logs.detail.emptyMessage", "Empty message")}</span>
 																)}
 															</MessageRow>
 														);
@@ -2959,7 +2966,7 @@ export function LogDetailView({
 							) : batchResultItems.length > 0 ? (
 								<div className="px-5 pt-5 pb-2">
 									<div className="text-muted-foreground mb-1 text-[10.5px] font-semibold tracking-wider uppercase">
-										Batch Results ({batchResultItems.length})
+										{t("logs.detail.batchResults", "Batch Results ({{count}})", { count: batchResultItems.length })}
 									</div>
 									<Accordion type="multiple" className="w-full">
 										{batchResultItems.map((result, index) => (
@@ -2972,7 +2979,7 @@ export function LogDetailView({
 																{result.model}
 															</Badge>
 														)}
-														{result.errorMessage && <span className="text-[11px] text-red-600 dark:text-red-400">Failed</span>}
+														{result.errorMessage && <span className="text-[11px] text-red-600 dark:text-red-400">{t("logs.detail.failed", "Failed")}</span>}
 													</span>
 												</AccordionTrigger>
 												<AccordionContent className="space-y-3 pb-2">
@@ -2989,7 +2996,7 @@ export function LogDetailView({
 																	{text ? (
 																		<CollapsibleCode text={text} preview={3} mono={false} />
 																	) : (
-																		<span className="text-muted-foreground text-xs">Empty message</span>
+																	<span className="text-muted-foreground text-xs">{t("logs.detail.emptyMessage", "Empty message")}</span>
 																	)}
 																</MessageRow>
 															);
@@ -2997,12 +3004,12 @@ export function LogDetailView({
 													) : result.rawFallback ? (
 														<div>
 															<div className="text-muted-foreground mb-1 text-[10.5px]">
-																Unrecognized result shape — showing the raw response body
+												{t("logs.detail.unrecognizedResultShape", "Unrecognized result shape — showing the raw response body")}
 															</div>
 															<CollapsibleCode text={result.rawFallback} preview={5} lang="json" />
 														</div>
 													) : (
-														<span className="text-muted-foreground text-xs">Empty result</span>
+														<span className="text-muted-foreground text-xs">{t("logs.detail.emptyResult", "Empty result")}</span>
 													)}
 												</AccordionContent>
 											</AccordionItem>
@@ -3011,7 +3018,7 @@ export function LogDetailView({
 								</div>
 							) : (
 								<div className="text-muted-foreground p-5 text-center text-sm">
-									No batch request or result details were captured for this row.
+									{t("logs.detail.noBatchDetails", "No batch request or result details were captured for this row.")}
 								</div>
 							)}
 						</div>
@@ -3021,7 +3028,7 @@ export function LogDetailView({
 				<TabsContent value="messages" className="space-y-4">
 					{log.content_hidden && (
 						<div className="text-muted-foreground rounded-sm border border-dashed p-5 text-center text-sm">
-							Content logging has been disabled for this request.
+							{t("logs.detail.contentLoggingDisabled", "Content logging has been disabled for this request.")}
 						</div>
 					)}
 					{/* Passthrough just renders the raw json, so there's nothing to filter */}
@@ -3037,7 +3044,7 @@ export function LogDetailView({
 											: "text-muted-foreground hover:text-foreground border-transparent hover:border-border",
 									)}
 								>
-									Messages
+									{t("logs.detail.tabMessages", "Messages")}
 									{visibleRoles.size < allRoles.length && (
 										<span className="bg-primary text-primary-foreground rounded-sm px-1 py-0.5 text-[10px] tabular-nums">
 											{visibleRoles.size}/{allRoles.length}
@@ -3051,7 +3058,7 @@ export function LogDetailView({
 									checked={visibleRoles.size === allRoles.length}
 									onCheckedChange={(checked) => setVisibleRoles(checked ? new Set(allRoles) : new Set())}
 								>
-									Show all messages
+									{t("logs.detail.showAllMessages", "Show all messages")}
 								</DropdownMenuCheckboxItem>
 								<DropdownMenuSeparator />
 								{(
@@ -3080,7 +3087,7 @@ export function LogDetailView({
 								))}
 								<DropdownMenuSeparator />
 								<DropdownMenuItem onClick={() => setVisibleRoles(new Set())} className="text-muted-foreground justify-center text-[12px]">
-									Clear all
+									{t("logs.detail.clearAll", "Clear all")}
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
@@ -3275,7 +3282,7 @@ export function LogDetailView({
 																const src = b.image_url?.url;
 																if (!src) return null;
 																return (
-																	<img key={`${i}-${src}`} src={src} alt="Attached image" className="mt-2 max-w-full rounded border" />
+																			<img key={`${i}-${src}`} src={src} alt={t("logs.detail.attachedImage", "Attached image")} className="mt-2 max-w-full rounded border" />
 																);
 															})}
 													{text &&
@@ -3353,7 +3360,7 @@ export function LogDetailView({
 															<div className="rounded-sm border border-red-200 bg-red-50/70 p-3 dark:border-red-900 dark:bg-red-950/30">
 																<div className="flex items-center gap-2 text-red-700 dark:text-red-400">
 																	<AlertCircle className="h-4 w-4 shrink-0" />
-																	<span className="text-[12.5px] font-semibold">Refusal</span>
+																					<span className="text-[12.5px] font-semibold">{t("logs.detail.refusal", "Refusal")}</span>
 																</div>
 																{refusalText && (
 																	<div className="mt-2 text-[13px] leading-relaxed break-words whitespace-pre-wrap text-red-700 dark:text-red-400">
@@ -3399,7 +3406,7 @@ export function LogDetailView({
 											<div className="rounded-sm border border-red-200 bg-red-50/70 p-3 dark:border-red-900 dark:bg-red-950/30">
 												<div className="flex items-center gap-2 text-red-700 dark:text-red-400">
 													<AlertCircle className="h-4 w-4 shrink-0" />
-													<span className="text-[12.5px] font-semibold">Refusal</span>
+																			<span className="text-[12.5px] font-semibold">{t("logs.detail.refusal", "Refusal")}</span>
 												</div>
 											</div>
 										</MessageRow>
@@ -3495,7 +3502,7 @@ export function LogDetailView({
 															<div key={`s-${i}`} className="space-y-1">
 																{reasoningParts.summaries.length > 1 ? (
 																	<div className="text-muted-foreground text-[10.5px] font-semibold tracking-wider uppercase">
-																		Summary {i + 1}
+																			{t("logs.detail.summaryIndex", "Summary {{index}}", { index: i + 1 })}
 																	</div>
 																) : null}
 																<CollapsibleCode text={s} preview={3} mono={false} />
@@ -3509,12 +3516,12 @@ export function LogDetailView({
 														{reasoningParts.signatures.length > 0 ? (
 															<EncryptedReveal
 																text={reasoningParts.signatures.join("\n\n")}
-																label={reasoningParts.signatures.length > 1 ? "Encrypted signatures" : "Encrypted signature"}
+											label={reasoningParts.signatures.length > 1 ? t("logs.detail.encryptedSignatures", "Encrypted signatures") : t("logs.detail.encryptedSignature", "Encrypted signature")}
 															/>
 														) : null}
 													</div>
 												) : (
-													<div className="text-muted-foreground text-[12px] italic">No reasoning content available</div>
+														<div className="text-muted-foreground text-[12px] italic">{t("logs.detail.noReasoningContent", "No reasoning content available")}</div>
 												)
 											) : text ? (
 												usePlainText ? (
@@ -3534,11 +3541,11 @@ export function LogDetailView({
 											) : Array.isArray(msg.tools) && msg.tools.length > 0 ? (
 												<CollapsibleCode text={JSON.stringify(msg.tools, null, 2)} preview={3} />
 											) : Array.isArray(msg.tools) ? (
-												<div className="text-muted-foreground text-[12px] italic">No tools declared</div>
+														<div className="text-muted-foreground text-[12px] italic">{t("logs.detail.noToolsDeclared", "No tools declared")}</div>
 											) : itemPayload ? (
 												<CollapsibleCode text={JSON.stringify(applyRedactionMappingToValue(itemPayload, mapping), null, 2)} preview={3} />
 											) : (
-												<div className="text-muted-foreground text-[12px] italic">No content</div>
+														<div className="text-muted-foreground text-[12px] italic">{t("logs.detail.noContent", "No content")}</div>
 											)}
 											{Array.isArray(msg.content) &&
 												msg.content
@@ -3547,7 +3554,7 @@ export function LogDetailView({
 														<img
 															key={`${i}-${b.image_url}`}
 															src={b.image_url}
-															alt="Attached image"
+															alt={t("logs.detail.attachedImage", "Attached image")}
 															className="mt-2 max-w-full rounded border"
 														/>
 													))}
@@ -3560,20 +3567,20 @@ export function LogDetailView({
 
 					{log.is_large_payload_request && !log.input_history?.length && !log.responses_input_history?.length && (
 						<div className="rounded-sm border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300">
-							Large payload request: input content was streamed directly to the provider and is not available for display.
-							{log.raw_request && " A truncated preview is available in the Raw JSON tab."}
+							{t("logs.detail.largePayloadRequestNotice", "Large payload request: input content was streamed directly to the provider and is not available for display.")}
+							{log.raw_request && ` ${t("logs.detail.largePayloadTruncatedPreviewInRawJson", "A truncated preview is available in the Raw JSON tab.")}`}
 						</div>
 					)}
 					{log.is_large_payload_response && !log.output_message && !log.responses_output?.length && log.status !== "processing" && (
 						<div className="rounded-sm border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300">
-							Large payload response: response content was streamed directly to the client and is not available for display.
-							{log.raw_response && " A truncated preview is available in the Raw JSON tab."}
+							{t("logs.detail.largePayloadResponseNotice", "Large payload response: response content was streamed directly to the client and is not available for display.")}
+							{log.raw_response && ` ${t("logs.detail.largePayloadTruncatedPreviewInRawJson", "A truncated preview is available in the Raw JSON tab.")}`}
 						</div>
 					)}
 
 					{log.status !== "processing" && log.embedding_output && log.embedding_output.length > 0 && !log.error_details?.error.message && (
 						<div className="bg-card space-y-3 rounded-sm border p-5">
-							<div className="text-sm font-medium">Embedding</div>
+							<div className="text-sm font-medium">{t("logs.detail.embedding", "Embedding")}</div>
 							<LogChatMessageView
 								message={{
 									role: "assistant",
@@ -3635,7 +3642,7 @@ export function LogDetailView({
 						<div className="rounded-sm border border-red-200 bg-red-50/70 p-5 dark:border-red-900 dark:bg-red-950/30">
 							<div className="flex items-center gap-2 text-red-700 dark:text-red-400">
 								<AlertCircle className="h-4 w-4 shrink-0" />
-								<span className="text-[12.5px] font-semibold">Error</span>
+								<span className="text-[12.5px] font-semibold">{t("logs.detail.error", "Error")}</span>
 								{displayErrorMessage ? <CopyInlineButton text={displayErrorMessage} /> : null}
 							</div>
 							<div className="mt-2 text-[13px] leading-relaxed break-words whitespace-pre-wrap text-red-700 dark:text-red-400">
@@ -3647,7 +3654,7 @@ export function LogDetailView({
 							{log.error_details?.error.error != null ? (
 								<details className="group mt-3 rounded-sm border border-red-200/70 bg-white/40 dark:border-red-900/70 dark:bg-red-950/40">
 									<summary className="flex cursor-pointer items-center justify-between px-3 py-2 text-[12px] text-red-700 hover:bg-red-50/80 dark:text-red-400 dark:hover:bg-red-950/60">
-										<span className="font-medium">Details</span>
+										<span className="font-medium">{t("logs.detail.errorDetails", "Details")}</span>
 										<ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
 									</summary>
 									<div className="custom-scrollbar max-h-[400px] overflow-y-auto border-t border-red-200/70 px-3 py-2 font-mono text-[11.5px] leading-[1.6] break-words whitespace-pre-wrap text-red-900 dark:border-red-900/70 dark:text-red-300">
@@ -3665,11 +3672,11 @@ export function LogDetailView({
 					{toolsParameter ? (
 						<div className="bg-card rounded-sm border p-5">
 							<div className="text-muted-foreground mb-3 text-[12px]">
-								{declaredTools.length} tools exposed to the model
+								{t("logs.detail.toolsExposedToModel", "{{count}} tools exposed to the model", { count: declaredTools.length })}
 								{inputDeclaredTools.length ? (
 									<>
 										{" "}
-										· {inputDeclaredTools.length} via input items
+										· {t("logs.detail.viaInputItems", "{{count}} via input items", { count: inputDeclaredTools.length })}
 										{inputDeclaredTools.length !== inputDeclaredToolEntries.length ? " (namespaces expanded)" : ""}
 									</>
 								) : null}
@@ -3708,7 +3715,7 @@ export function LogDetailView({
 											{schemaJson ? (
 												<div className="border-t">
 													<div className="text-muted-foreground flex items-center justify-between px-3 py-1.5 text-[10.5px] tracking-wider uppercase">
-														<span className="font-semibold">Parameters</span>
+										<span className="font-semibold">{t("logs.detail.parameters", "Parameters")}</span>
 														<CopyInlineButton text={schemaJson} />
 													</div>
 													<pre className="custom-scrollbar max-h-[300px] overflow-auto border-t px-3 py-2 font-mono text-[11.5px] leading-[1.6] whitespace-pre">
@@ -3716,7 +3723,7 @@ export function LogDetailView({
 													</pre>
 												</div>
 											) : (
-												<div className="text-muted-foreground border-t px-3 py-2 text-[11.5px]">No parameter schema.</div>
+											<div className="text-muted-foreground border-t px-3 py-2 text-[11.5px]">{t("logs.detail.noParameterSchema", "No parameter schema.")}</div>
 											)}
 										</details>
 									);
@@ -3733,7 +3740,7 @@ export function LogDetailView({
 					)}
 					{!toolsParameter && !log.params?.instructions && (
 						<div className="text-muted-foreground rounded-sm border border-dashed p-5 text-center text-sm">
-							No tools or instructions on this request.
+							{t("logs.detail.noToolsOrInstructions", "No tools or instructions on this request.")}
 						</div>
 					)}
 				</TabsContent>
@@ -3741,7 +3748,7 @@ export function LogDetailView({
 				<TabsContent value="routing" className="space-y-3">
 					{log.attempt_trail && log.attempt_trail.length > 1 && (
 						<CollapsibleBox
-							title={`Attempt Trail (${log.attempt_trail.length} attempts)`}
+							title={t("logs.detail.attemptTrail", "Attempt Trail ({{count}} attempts)", { count: log.attempt_trail.length })}
 							onCopy={() => JSON.stringify(log.attempt_trail, null, 2)}
 						>
 							<div className="overflow-x-auto px-4 py-3 md:px-6">
@@ -3749,8 +3756,8 @@ export function LogDetailView({
 									<thead>
 										<tr className="border-border text-muted-foreground border-b">
 											<th className="py-1 pr-6 text-left font-medium">#</th>
-											<th className="py-1 pr-6 text-left font-medium">Key</th>
-											<th className="py-1 text-left font-medium">Result</th>
+											<th className="py-1 pr-6 text-left font-medium">{t("logs.detail.key", "Key")}</th>
+											<th className="py-1 text-left font-medium">{t("logs.detail.result", "Result")}</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -3762,7 +3769,7 @@ export function LogDetailView({
 													{record.fail_reason ? (
 														<span className="text-destructive">{record.fail_reason}</span>
 													) : (
-														<span className="text-chart-success-ink">success</span>
+															<span className="text-chart-success-ink">{t("logs.detail.success", "success")}</span>
 													)}
 												</td>
 											</tr>
@@ -3776,7 +3783,7 @@ export function LogDetailView({
 						<RoutingDecisionLogs logs={log.routing_engine_logs} />
 					) : (
 						<div className="text-muted-foreground rounded-sm border border-dashed p-5 text-center text-sm">
-							No routing logs for this request.
+							{t("logs.detail.noRoutingLogsForRequest", "No routing logs for this request.")}
 						</div>
 					)}
 				</TabsContent>
@@ -3786,7 +3793,7 @@ export function LogDetailView({
 						<PluginLogsView pluginLogs={log.plugin_logs} />
 					) : (
 						<div className="text-muted-foreground rounded-sm border border-dashed p-5 text-center text-sm">
-							No plugin logs for this request.
+								{t("logs.detail.noPluginLogsForRequest", "No plugin logs for this request.")}
 						</div>
 					)}
 				</TabsContent>
@@ -3795,9 +3802,9 @@ export function LogDetailView({
 					{rawRequest && (
 						<>
 							<div className="text-muted-foreground text-[12px]">
-								Raw Request sent to <span className="text-foreground font-medium capitalize">{log.provider}</span>
+										{t("logs.detail.rawRequestSentTo", "Raw Request sent to")} <span className="text-foreground font-medium capitalize">{log.provider}</span>
 								{log.is_large_payload_request && (
-									<span className="ml-2 text-xs font-normal text-amber-600 dark:text-amber-400">(truncated preview)</span>
+										<span className="ml-2 text-xs font-normal text-amber-600 dark:text-amber-400">{t("logs.detail.truncatedPreview", "(truncated preview)")}</span>
 								)}
 							</div>
 							<CollapsibleBox
@@ -3826,9 +3833,9 @@ export function LogDetailView({
 					{rawResponse && log.status !== "processing" && (
 						<>
 							<div className="text-muted-foreground pt-4 text-[12px]">
-								Raw Response from <span className="text-foreground font-medium capitalize">{log.provider}</span>
+										{t("logs.detail.rawResponseFrom", "Raw Response from")} <span className="text-foreground font-medium capitalize">{log.provider}</span>
 								{log.is_large_payload_response && (
-									<span className="ml-2 text-xs font-normal text-amber-600 dark:text-amber-400">(truncated preview)</span>
+										<span className="ml-2 text-xs font-normal text-amber-600 dark:text-amber-400">{t("logs.detail.truncatedPreview", "(truncated preview)")}</span>
 								)}
 							</div>
 							<CollapsibleBox
