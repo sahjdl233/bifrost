@@ -1096,7 +1096,7 @@ function MessageHistoryCollapse({ count, children }: { count: number; children: 
 				<ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
 				{open
 					? t("logs.detail.hideEarlierHistory", "Hide earlier history")
-					: t("logs.detail.showEarlierMessages", "Show {{count}} earlier message{{plural}}", { count, plural: count === 1 ? "" : "s" })}
+					: t("logs.detail.showEarlierMessages", "Show {{count}} earlier messages", { count })}
 				<span className="bg-border h-px flex-1" />
 			</button>
 			{open ? children : null}

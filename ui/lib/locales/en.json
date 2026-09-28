@@ -1784,7 +1784,7 @@
 			"showMoreLines": "Show {{count}} more lines",
 			"codeLineCount": "{{count}} lines",
 			"hideEarlierHistory": "Hide earlier history",
-			"showEarlierMessages": "Show {{count}} earlier message{{plural}}",
+			"showEarlierMessages": "Show {{count}} earlier messages",
 			"noRawJson": "No raw JSON available.",
 			"rawJsonDisabled": "Raw JSON storage is disabled by settings",
 			"rawJsonDisabledBody": "{{provider}} is configured not to persist raw request and response payloads in log records, so there is nothing to show here. To start capturing them:",
@@ -2059,7 +2059,7 @@
 		},
 		"common": {
 			"copy": "Copy",
-			"showLess": "show less",
+			"showLess": "Show less",
 			"showMore": "show more",
 			"delete": "Delete",
 			"cancel": "Cancel",
@@ -2149,8 +2149,14 @@
 			"idBadgeTooltip": "Looking up this request ID exactly. The selected time range is ignored so the request is found wherever it falls.",
 			"modeTriggerTitle": "Choose whether the box searches log content or looks up a request ID",
 			"modeAutoDetect": "Auto detect",
+			"modeAuto": "Auto detect",
 			"modeContentSearch": "Content search",
-			"modeRequestIdSearch": "Request ID search"
+			"modeContent": "Content search",
+			"modeRequestIdSearch": "Request ID search",
+			"modeRequestId": "Request ID search",
+			"placeholderAuto": "Search logs...",
+			"placeholderContent": "Search log content...",
+			"placeholderRequestId": "Enter request ID..."
 		},
 		"table": {
 			"loading": "Loading logs...",
@@ -2214,8 +2220,10 @@
 			"nextPage": "Next page"
 		},
 		"speech": {
+			"audioPlayerLoadFailed": "Failed to load audio player",
 			"input": "Speech Input",
-			"output": "Speech Output"
+			"output": "Speech Output",
+			"unknownError": "Unknown error"
 		},
 		"transcription": {
 			"input": "Transcription Input",

@@ -2181,8 +2181,14 @@
 			"idBadge": "ID",
 			"idBadgeTooltip": "精确查询该请求 ID。所选时间范围会被忽略，因此无论落在哪个区间都能找到该请求。",
 			"modeAutoDetect": "自动识别",
+			"modeAuto": "自动识别",
 			"modeContentSearch": "内容搜索",
+			"modeContent": "内容搜索",
 			"modeRequestIdSearch": "请求 ID 搜索",
+			"modeRequestId": "请求 ID 搜索",
+			"placeholderAuto": "搜索日志...",
+			"placeholderContent": "搜索日志内容...",
+			"placeholderRequestId": "输入请求 ID...",
 			"modeTriggerTitle": "选择该输入框是搜索日志内容还是按请求 ID 查询"
 		},
 		"session": {
@@ -2204,8 +2210,10 @@
 			"totalTokens": "Token 总数"
 		},
 		"speech": {
+			"audioPlayerLoadFailed": "音频播放器加载失败",
 			"input": "语音输入",
-			"output": "语音输出"
+			"output": "语音输出",
+			"unknownError": "未知错误"
 		},
 		"table": {
 			"entriesSummary": "第 {{start}}-{{end}} 条，共 {{total}} 条",
