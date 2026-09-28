@@ -2259,5 +2259,20 @@
 			"status": "状态",
 			"videoId": "视频 ID"
 		}
-	}
+	},
+	"observability": {
+    "common": {
+      "beta": "BETA",
+      "comingSoon": "即将推出",
+      "copied": "已复制！",
+      "copy": "复制",
+      "deleteConnector": "删除连接器",
+      "enabled": "已启用",
+      "error": "错误",
+      "fixValidationErrors": "请修正校验错误",
+      "noChangesMade": "未做任何更改",
+      "providers": "提供商",
+      "reset": "重置"
+    }
+  }
 }

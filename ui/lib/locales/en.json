@@ -2259,5 +2259,20 @@
 			"openVideoUrl": "Open video URL",
 			"listOutput": "Video List Output ({{count}})"
 		}
-	}
+	},
+	"observability": {
+    "common": {
+      "beta": "BETA",
+      "comingSoon": "Coming soon",
+      "copied": "Copied!",
+      "copy": "Copy",
+      "deleteConnector": "Delete connector",
+      "enabled": "Enabled",
+      "error": "Error",
+      "fixValidationErrors": "fix validation errors",
+      "noChangesMade": "No changes made",
+      "providers": "Providers",
+      "reset": "Reset"
+    }
+  }
 }
