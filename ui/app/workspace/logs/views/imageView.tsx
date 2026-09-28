@@ -99,7 +99,7 @@ export default function ImageView({ imageInput, imageEditInput, imageVariationIn
 											<img
 												key={i}
 												src={getImageSrc(img.image)}
-											alt={t("logs.image.inputImageAlt", "Input image {{index}}", { index: i + 1 })}
+												alt={t("logs.image.inputImageAltWithIndex", "Input image {{index}}", { index: i + 1 })}
 												className="max-h-48 max-w-48 rounded border object-contain"
 											/>
 										) : null,

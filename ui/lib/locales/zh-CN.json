@@ -2123,7 +2123,8 @@
 		"image": {
 			"input": "{{method}} 输入",
 			"inputImage": "输入图片",
-			"inputImageAlt": "输入图片 {{index}}",
+			"inputImageAlt": "输入图片",
+			"inputImageAltWithIndex": "输入图片 {{index}}",
 			"inputImages": "输入图片",
 			"nextImage": "下一张图片",
 			"output": "{{method}} 输出",
