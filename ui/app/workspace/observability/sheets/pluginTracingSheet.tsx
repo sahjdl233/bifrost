@@ -7,6 +7,7 @@ import { TriStateCheckbox } from "@/components/ui/tristateCheckbox";
 import { getErrorMessage, useGetLoadedPluginsQuery, useGetPluginQuery, useUpdatePluginMutation } from "@/lib/store";
 import { PluginSpanFilter } from "@/lib/types/config";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 interface PluginTracingSheetProps {
@@ -63,6 +64,7 @@ function PluginRow({ name, checked, onChange }: { name: string; checked: boolean
 }
 
 export default function PluginTracingSheet({ open, onClose, pluginName, destination, showOverheadToggle = true }: PluginTracingSheetProps) {
+	const { t } = useTranslation();
 	// All currently loaded plugins (built-in, enterprise, custom, and auto-loaded) that can
 	// emit spans, named to match the connector's span filter. One flat list — the backend
 	// already returns the complete set, so there's no built-in/custom split to maintain.
@@ -95,13 +97,17 @@ export default function PluginTracingSheet({ open, onClose, pluginName, destinat
 			// Toggles haven't been initialized from persisted config yet (e.g. the plugin list
 			// is still loading for an include-mode filter). Saving now would build an empty
 			// filter and wipe the stored plugin_span_filter, so block until init completes.
-			toast.error("Plugin list is still loading. Please wait before saving.");
-			return;
-		}
-		if (!targetPlugin) {
-			toast.error(`${destination} is not configured yet. Save its configuration before configuring plugin tracing.`);
-			return;
-		}
+		toast.error(t("observability.tracing.pluginListLoading", "Plugin list is still loading. Please wait before saving."));
+		return;
+	}
+	if (!targetPlugin) {
+		toast.error(
+			t("observability.tracing.destinationNotConfigured", "{{destination}} is not configured yet. Save its configuration before configuring plugin tracing.", {
+				destination,
+			}),
+		);
+		return;
+	}
 		const filter = buildFilter(toggles);
 		const config: Record<string, unknown> = { plugin_span_filter: filter };
 		if (showOverheadToggle) {
@@ -115,28 +121,28 @@ export default function PluginTracingSheet({ open, onClose, pluginName, destinat
 					config,
 				},
 			}).unwrap();
-			toast.success("Tracing configuration saved");
-			onClose();
-		} catch (error) {
-			toast.error(getErrorMessage(error));
-		}
-	}, [toggles, exportOverheadSpans, showOverheadToggle, targetPlugin, updatePlugin, onClose, pluginName, destination]);
+		toast.success(t("observability.tracing.saved", "Tracing configuration saved"));
+		onClose();
+	} catch (error) {
+		toast.error(getErrorMessage(error));
+	}
+	}, [toggles, exportOverheadSpans, showOverheadToggle, targetPlugin, updatePlugin, onClose, pluginName, destination, t]);
 
 	return (
 		<Sheet open={open} onOpenChange={onClose}>
 			<SheetContent className="flex w-full flex-col overflow-hidden p-4 md:p-8">
 				<SheetHeader className="flex flex-col items-start p-0">
-					<SheetTitle>Configure Tracing</SheetTitle>
-					<SheetDescription>
-						Choose which spans are exported to {destination}. Disabling a plugin removes its spans from traces without affecting execution.
-					</SheetDescription>
+				<SheetTitle>{t("observability.tracing.configureTitle", "Configure Tracing")}</SheetTitle>
+				<SheetDescription>
+					{t("observability.tracing.configureDescription", "Choose which spans are exported to {{destination}}. Disabling a plugin removes its spans from traces without affecting execution.", { destination })}
+				</SheetDescription>
 				</SheetHeader>
 
 				<div className="mt-4 flex-1 overflow-y-auto">
 					<div className="flex flex-col gap-4">
 						<div>
 							<div className="mb-2 flex items-center justify-between">
-								<p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">Plugins</p>
+								<p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("observability.tracing.plugins", "Plugins")}</p>
 								<TriStateCheckbox
 									allIds={allPlugins}
 									selectedIds={allPlugins.filter((n) => toggles[n] ?? true)}
@@ -148,7 +154,7 @@ export default function PluginTracingSheet({ open, onClose, pluginName, destinat
 											return updated;
 										});
 									}}
-									ariaLabel="Toggle all plugin tracing"
+										ariaLabel={t("observability.tracing.toggleAll", "Toggle all plugin tracing")}
 									data-testid="plugin-tracing-select-all"
 								/>
 							</div>
@@ -163,13 +169,13 @@ export default function PluginTracingSheet({ open, onClose, pluginName, destinat
 							<>
 								<div className="border-t" />
 								<div>
-									<p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">Overhead</p>
-									<div className="flex items-center justify-between rounded-md border px-3 py-2.5">
-										<div className="flex flex-col">
-											<span className="text-sm">Overhead latency spans</span>
-											<span className="text-muted-foreground text-xs">
-												Internal timing spans (setup, key selection, pipeline phases). Off by default.
-											</span>
+					<p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">{t("observability.tracing.overhead", "Overhead")}</p>
+					<div className="flex items-center justify-between rounded-md border px-3 py-2.5">
+						<div className="flex flex-col">
+							<span className="text-sm">{t("observability.tracing.overheadLatencySpans", "Overhead latency spans")}</span>
+							<span className="text-muted-foreground text-xs">
+								{t("observability.tracing.overheadLatencySpansDescription", "Internal timing spans (setup, key selection, pipeline phases). Off by default.")}
+							</span>
 										</div>
 										<Switch checked={exportOverheadSpans} onCheckedChange={setExportOverheadSpans} data-testid="tracing-overhead-toggle" />
 									</div>
@@ -180,27 +186,35 @@ export default function PluginTracingSheet({ open, onClose, pluginName, destinat
 				</div>
 
 				<div className="flex flex-col gap-2 pt-4">
-					<Alert variant="info">
-						<AlertDescription>
-							<span>
-								If <strong className="inline">plugin_span_filter</strong> is set in the <strong className="inline">{pluginName}</strong>{" "}
-								plugin config in config.json, it takes precedence over these settings after restarting Bifrost.
-							</span>
-						</AlertDescription>
-					</Alert>
-					<div className="flex justify-end gap-2 pt-2">
-						<Button type="button" variant="outline" onClick={onClose} disabled={isLoading} data-testid="plugin-tracing-cancel-button">
-							Cancel
-						</Button>
+			<Alert variant="info">
+				<AlertDescription>
+					<Trans
+						t={t}
+						i18nKey="observability.tracing.spanFilterPrecedence"
+						defaults="If <1>plugin_span_filter</1> is set in the <1>{{pluginName}}</1> plugin config in config.json, it takes precedence over these settings after restarting Bifrost."
+						components={{
+							1: <strong className="inline" />,
+						}}
+						values={{ pluginName }}
+					>
+						If <strong className="inline">plugin_span_filter</strong> is set in the <strong className="inline">{pluginName}</strong>{" "}
+						plugin config in config.json, it takes precedence over these settings after restarting Bifrost.
+					</Trans>
+				</AlertDescription>
+			</Alert>
+			<div className="flex justify-end gap-2 pt-2">
+				<Button type="button" variant="outline" onClick={onClose} disabled={isLoading} data-testid="plugin-tracing-cancel-button">
+					{t("observability.tracing.cancel", "Cancel")}
+				</Button>
 						<Button
 							onClick={handleSave}
 							disabled={isLoading || !wasOpenRef.current || !hasUpdateAccess}
-							title={hasUpdateAccess ? undefined : "You do not have permission to change observability settings"}
+					title={hasUpdateAccess ? undefined : t("observability.tracing.noPermission", "You do not have permission to change observability settings")}
 							isLoading={isLoading}
 							data-testid="plugin-tracing-save-button"
 							type="button"
 						>
-							Save
+					{t("observability.tracing.save", "Save")}
 						</Button>
 					</div>
 				</div>

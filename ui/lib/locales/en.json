@@ -2259,5 +2259,404 @@
 			"openVideoUrl": "Open video URL",
 			"listOutput": "Video List Output ({{count}})"
 		}
+	},
+	"observability": {
+		"common": {
+			"beta": {
+				"beta": "BETA"
+			},
+			"comingSoon": {
+				"comingSoon": "Coming soon"
+			},
+			"copied": {
+				"copied": "Copied!"
+			},
+			"copy": {
+				"copy": "Copy"
+			},
+			"deleteConnector": {
+				"deleteConnector": "Delete connector"
+			},
+			"enabled": {
+				"enabled": "Enabled"
+			},
+			"error": {
+				"error": "Error"
+			},
+			"fixValidationErrors": {
+				"fixValidationErrors": "Please fix validation errors"
+			},
+			"noChangesAndValidationErrors": {
+				"noChangesAndValidationErrors": "No changes made and validation errors present"
+			},
+			"noChangesMade": {
+				"noChangesMade": "No changes made"
+			},
+			"providers": {
+				"providers": "Providers"
+			},
+			"reset": {
+				"reset": "Reset"
+			}
+		},
+		"maxim": {
+			"apiKey": {
+				"apiKey": "API Key"
+			},
+			"apiKeyPlaceholder": {
+				"apiKeyPlaceholder": "Enter your Maxim API key"
+			},
+			"configUpdateFailed": {
+				"configUpdateFailed": "Failed to update Maxim configuration"
+			},
+			"configUpdated": {
+				"configUpdated": "Maxim configuration updated successfully"
+			},
+			"configuration": {
+				"configuration": "Configuration"
+			},
+			"hideApiKey": {
+				"hideApiKey": "Hide API key"
+			},
+			"logRepoHeaderDescription": {
+				"logRepoHeaderDescription": "You can send in header <1>x-bf-log-repo-id</1> with a repository ID to log to a specific repository."
+			},
+			"logRepoId": {
+				"logRepoId": "Log Repository ID (Optional)"
+			},
+			"logRepoIdPlaceholder": {
+				"logRepoIdPlaceholder": "Enter log repository ID"
+			},
+			"optional": {
+				"optional": "(Optional)"
+			},
+			"requestHeaders": {
+				"requestHeaders": "Request Headers"
+			},
+			"requestHeadersDescription": {
+				"requestHeadersDescription": "Comma-separated list of request headers to capture and attach as trace tags. Supports exact names and wildcard patterns (e.g. <1>x-custom-*</1> captures all headers with that prefix, <2>*</2> captures all headers; note that <2>*</2> will capture sensitive headers like Authorization)."
+			},
+			"saveConfiguration": {
+				"saveConfiguration": "Save Maxim Configuration"
+			},
+			"showApiKey": {
+				"showApiKey": "Show API key"
+			}
+		},
+		"otel": {
+			"addProfile": {
+				"addProfile": "Add Profile"
+			},
+			"commonHeaders": {
+				"commonHeaders": "Common Headers"
+			},
+			"commonHeadersDescription": {
+				"commonHeadersDescription": "Sent to both the trace and metrics endpoints."
+			},
+			"configUpdateFailed": {
+				"configUpdateFailed": "Failed to update OTEL configuration"
+			},
+			"configUpdated": {
+				"configUpdated": "OTEL configuration updated successfully"
+			},
+			"configureTracing": {
+				"configureTracing": "Configure Tracing"
+			},
+			"disableContentLogging": {
+				"disableContentLogging": "Disable Content Logging"
+			},
+			"disableContentLoggingDescription": {
+				"disableContentLoggingDescription": "When enabled, message content (input/output messages, tool definitions, and tool call arguments/results) is dropped from exported spans. Only metadata such as model, tokens, and latency is sent to the collector."
+			},
+			"disableRootSpanContent": {
+				"disableRootSpanContent": "Disable Root Span Content"
+			},
+			"disableRootSpanContentDescription": {
+				"disableRootSpanContentDescription": "When enabled, input/output message content is dropped from the root span only; the underlying generation (llm.call) span keeps the full content."
+			},
+			"disabled": {
+				"disabled": "Disabled"
+			},
+			"enableMetricsExport": {
+				"enableMetricsExport": "Enable Metrics Export"
+			},
+			"enableMetricsExportDescription": {
+				"enableMetricsExportDescription": "Push metrics to an OTEL Collector for proper aggregation in cluster deployments"
+			},
+			"enableOverheadBreakdown": {
+				"enableOverheadBreakdown": "Enable overhead breakdown"
+			},
+			"enableProfile": {
+				"enableProfile": "Enable profile"
+			},
+			"enableTraceExport": {
+				"enableTraceExport": "Enable Trace Export"
+			},
+			"enableTraceExportDescription": {
+				"enableTraceExportDescription": "Export spans to the OTLP collector. Turn off for a metrics-only profile."
+			},
+			"exportTimeoutDescription": {
+				"exportTimeoutDescription": "Maximum time for a single trace export (1-60 seconds). Traces are dropped rather than retried past this limit, so an unreachable collector cannot slow down request handling."
+			},
+			"exportTimeoutSeconds": {
+				"exportTimeoutSeconds": "Export Timeout (seconds)"
+			},
+			"format": {
+				"format": "Format"
+			},
+			"groupTracesBySession": {
+				"groupTracesBySession": "Group Traces by Session"
+			},
+			"groupTracesBySessionDescription": {
+				"groupTracesBySessionDescription": "When enabled, requests sharing the same x-bf-session-id header are grouped into a single trace, each request appearing as a top-level sibling span. A request carrying an inbound W3C traceparent stays on its own distributed trace and is unaffected."
+			},
+			"insecureSkipTls": {
+				"insecureSkipTls": "Insecure (Skip TLS)"
+			},
+			"insecureSkipTlsDescription": {
+				"insecureSkipTlsDescription": "Skip TLS verification. Disable this to use TLS with system root CAs or a custom CA certificate."
+			},
+			"metricsEndpoint": {
+				"metricsEndpoint": "Metrics Endpoint"
+			},
+			"metricsHeaders": {
+				"metricsHeaders": "Metrics Headers"
+			},
+			"metricsHeadersDescription": {
+				"metricsHeadersDescription": "Sent only to the metrics endpoint, in addition to the common headers (e.g. a Databricks table name)."
+			},
+			"metricsOnly": {
+				"metricsOnly": "Metrics only"
+			},
+			"metricsTab": {
+				"metricsTab": "Metrics"
+			},
+			"optional": {
+				"optional": "(Optional)"
+			},
+			"otlpCollectorUrl": {
+				"otlpCollectorUrl": "OTLP Collector URL"
+			},
+			"overheadBreakdown": {
+				"overheadBreakdown": "Overhead breakdown"
+			},
+			"overheadBreakdownDescription": {
+				"overheadBreakdownDescription": "Export per-component Bifrost overhead latency as a histogram."
+			},
+			"profileFallbackName": {
+				"profileFallbackName": "Profile {{index}}"
+			},
+			"protocol": {
+				"protocol": "Protocol"
+			},
+			"protocolDescription": {
+				"protocolDescription": "Transport used for both trace and metrics export."
+			},
+			"protocolGrpc": {
+				"protocolGrpc": "GRPC"
+			},
+			"protocolHttp": {
+				"protocolHttp": "HTTP"
+			},
+			"pushIntervalDescription": {
+				"pushIntervalDescription": "How often to push metrics (1-300 seconds)"
+			},
+			"pushIntervalSeconds": {
+				"pushIntervalSeconds": "Push Interval (seconds)"
+			},
+			"removeProfile": {
+				"removeProfile": "Remove profile"
+			},
+			"requestHeaders": {
+				"requestHeaders": "Request Headers"
+			},
+			"requestHeadersDescription": {
+				"requestHeadersDescription": "Comma-separated list of request headers to capture and emit as span attributes. Supports exact names and wildcard patterns (e.g. <1>x-custom-*</1> captures all headers with that prefix, <2>*</2> captures all headers; note that <2>*</2> will capture sensitive headers like Authorization)."
+			},
+			"saveConfiguration": {
+				"saveConfiguration": "Save OTEL Configuration"
+			},
+			"selectProtocol": {
+				"selectProtocol": "Select protocol"
+			},
+			"selectTraceType": {
+				"selectTraceType": "Select trace type"
+			},
+			"serviceName": {
+				"serviceName": "Service Name"
+			},
+			"serviceNameDescription": {
+				"serviceNameDescription": "If kept empty, the service name will be set to \"bifrost\""
+			},
+			"tlsCaCertPath": {
+				"tlsCaCertPath": "TLS CA Certificate Path"
+			},
+			"tlsCaCertPathDescription": {
+				"tlsCaCertPathDescription": "File path to the CA certificate on the Bifrost server. Leave empty to use system root CAs."
+			},
+			"traceHeaders": {
+				"traceHeaders": "Trace Headers"
+			},
+			"traceHeadersDescription": {
+				"traceHeadersDescription": "Sent only to the trace endpoint, in addition to the common headers."
+			},
+			"traceTypeGenaiExtension": {
+				"traceTypeGenaiExtension": "OTel GenAI Extension (Recommended)"
+			},
+			"traceTypeOpenInference": {
+				"traceTypeOpenInference": "Arize OpenInference"
+			},
+			"traceTypeVercel": {
+				"traceTypeVercel": "Vercel AI SDK"
+			},
+			"tracesTab": {
+				"tracesTab": "Traces"
+			}
+		},
+		"prometheus": {
+			"addBasicAuth": {
+				"addBasicAuth": "Add Basic Auth"
+			},
+			"basicAuthentication": {
+				"basicAuthentication": "Basic Authentication"
+			},
+			"configUpdateFailed": {
+				"configUpdateFailed": "Failed to update Prometheus configuration"
+			},
+			"configUpdated": {
+				"configUpdated": "Prometheus configuration updated successfully"
+			},
+			"fixErrorsBeforeSaving": {
+				"fixErrorsBeforeSaving": "Fix validation errors before saving"
+			},
+			"fixErrorsInOtherTab": {
+				"fixErrorsInOtherTab": "Fix validation errors in the {{tab}} tab before saving"
+			},
+			"instanceId": {
+				"instanceId": "Instance ID"
+			},
+			"instanceIdPlaceholder": {
+				"instanceIdPlaceholder": "Auto-generated from hostname"
+			},
+			"instanceIdTooltip": {
+				"instanceIdTooltip": "Used to identify this Bifrost instance in metrics. If not set, hostname is used automatically."
+			},
+			"jobName": {
+				"jobName": "Job Name"
+			},
+			"jobNameDescription": {
+				"jobNameDescription": "Job label for metrics"
+			},
+			"metricsEndpoint": {
+				"metricsEndpoint": "Metrics Endpoint"
+			},
+			"metricsEndpointDescription": {
+				"metricsEndpointDescription": "Configure your Prometheus server to scrape this endpoint. Served only while Pull-based scraping is enabled."
+			},
+			"multiNodeAlert": {
+				"multiNodeAlert": "If you are running multiple Bifrost nodes, use push gateway for accurate metrics. Pull-based /metrics scraping may miss nodes behind a load balancer."
+			},
+			"noChangesInTab": {
+				"noChangesInTab": "No changes made in this tab"
+			},
+			"overheadBreakdown": {
+				"overheadBreakdown": "Overhead breakdown"
+			},
+			"overheadBreakdownDescription": {
+				"overheadBreakdownDescription": "Export per-component Bifrost overhead latency as a histogram."
+			},
+			"password": {
+				"password": "Password"
+			},
+			"pullBasedScraping": {
+				"pullBasedScraping": "Pull-based Scraping"
+			},
+			"pullBasedScrapingDescription": {
+				"pullBasedScrapingDescription": "Prometheus can scrape metrics from the /metrics endpoint"
+			},
+			"pushBasedDescription": {
+				"pushBasedDescription": "Push metrics to a Prometheus Push Gateway for proper aggregation in cluster deployments"
+			},
+			"pushBasedPushGateway": {
+				"pushBasedPushGateway": "Push-based (Push Gateway)"
+			},
+			"pushGatewayUrl": {
+				"pushGatewayUrl": "Push Gateway URL"
+			},
+			"pushGatewayUrlDescription": {
+				"pushGatewayUrlDescription": "URL of your Prometheus Push Gateway"
+			},
+			"pushIntervalDescription": {
+				"pushIntervalDescription": "How often to push (1-300s)"
+			},
+			"pushIntervalSeconds": {
+				"pushIntervalSeconds": "Push Interval (seconds)"
+			},
+			"removeBasicAuth": {
+				"removeBasicAuth": "Remove basic auth"
+			},
+			"saveConfiguration": {
+				"saveConfiguration": "Save Prometheus Configuration"
+			},
+			"tabPullBased": {
+				"tabPullBased": "Pull-based"
+			},
+			"tabPushBased": {
+				"tabPushBased": "Push-based"
+			},
+			"userLabels": {
+				"userLabels": "User labels"
+			},
+			"userLabelsDescription": {
+				"userLabelsDescription": "Add user data labels to metrics"
+			},
+			"username": {
+				"username": "Username"
+			}
+		},
+		"tracing": {
+			"cancel": {
+				"cancel": "Cancel"
+			},
+			"configureDescription": {
+				"configureDescription": "Choose which spans are exported to {{destination}}. Disabling a plugin removes its spans from traces without affecting execution."
+			},
+			"configureTitle": {
+				"configureTitle": "Configure Tracing"
+			},
+			"destinationNotConfigured": {
+				"destinationNotConfigured": "{{destination}} is not configured yet. Save its configuration before configuring plugin tracing."
+			},
+			"noPermission": {
+				"noPermission": "You do not have permission to change observability settings"
+			},
+			"overhead": {
+				"overhead": "Overhead"
+			},
+			"overheadLatencySpans": {
+				"overheadLatencySpans": "Overhead latency spans"
+			},
+			"overheadLatencySpansDescription": {
+				"overheadLatencySpansDescription": "Internal timing spans (setup, key selection, pipeline phases). Off by default."
+			},
+			"pluginListLoading": {
+				"pluginListLoading": "Plugin list is still loading. Please wait before saving."
+			},
+			"plugins": {
+				"plugins": "Plugins"
+			},
+			"save": {
+				"save": "Save"
+			},
+			"saved": {
+				"saved": "Tracing configuration saved"
+			},
+			"spanFilterPrecedence": {
+				"spanFilterPrecedence": "If <1>plugin_span_filter</1> is set in the <1>{{pluginName}}</1> plugin config in config.json, it takes precedence over these settings after restarting Bifrost."
+			},
+			"toggleAll": {
+				"toggleAll": "Toggle all plugin tracing"
+			}
+		}
 	}
 }

@@ -5,6 +5,7 @@ import { toHeaderStringMap } from "@/lib/utils/secretVarForm";
 import { RbacOperation, RbacResource, useRbac } from "@enterprise/lib/contexts/rbacContext";
 import { Activity } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { OtelFormFragment } from "../../fragments/otelFormFragment";
 import PluginTracingSheet from "../../sheets/pluginTracingSheet";
@@ -15,6 +16,7 @@ interface OtelViewProps {
 }
 
 export default function OtelView({ onDelete, isDeleting }: OtelViewProps) {
+	const { t } = useTranslation();
 	const selectedPlugin = useAppSelector((state) => state.plugin.selectedPlugin);
 	const currentConfig = useMemo(() => ({ config: selectedPlugin?.config, enabled: selectedPlugin?.enabled }), [selectedPlugin]);
 	const [updatePlugin] = useUpdatePluginMutation();
@@ -42,10 +44,10 @@ export default function OtelView({ onDelete, isDeleting }: OtelViewProps) {
 				.unwrap()
 				.then(() => {
 					resolve();
-					toast.success("OTEL configuration updated successfully");
+					toast.success(t("observability.otel.configUpdated", "OTEL configuration updated successfully"));
 				})
 				.catch((err) => {
-					toast.error("Failed to update OTEL configuration", {
+					toast.error(t("observability.otel.configUpdateFailed", "Failed to update OTEL configuration"), {
 						description: getErrorMessage(err),
 					});
 					reject(err);
@@ -66,7 +68,7 @@ export default function OtelView({ onDelete, isDeleting }: OtelViewProps) {
 							data-testid="otel-configure-tracing-button"
 						>
 							<Activity className="h-4 w-4" />
-							Configure Tracing
+							{t("observability.otel.configureTracing", "Configure Tracing")}
 						</Button>
 					</div>
 				)}

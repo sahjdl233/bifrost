@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
+import { Trans, useTranslation } from "react-i18next";
 
 interface MaximFormFragmentProps {
 	initialConfig?: {
@@ -25,6 +26,7 @@ interface MaximFormFragmentProps {
 }
 
 export function MaximFormFragment({ initialConfig, onSave, onDelete, isDeleting = false, isLoading = false }: MaximFormFragmentProps) {
+	const { t } = useTranslation();
 	const hasMaximAccess = useRbac(RbacResource.Observability, RbacOperation.Update);
 	const [showApiKey, setShowApiKey] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
@@ -70,12 +72,12 @@ export function MaximFormFragment({ initialConfig, onSave, onDelete, isDeleting 
 							name="maxim_config.api_key"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>API Key</FormLabel>
+									<FormLabel>{t("observability.maxim.apiKey", "API Key")}</FormLabel>
 									<FormControl>
 										<div className="relative">
 											<Input
 												type={showApiKey ? "text" : "password"}
-												placeholder="Enter your Maxim API key"
+												placeholder={t("observability.maxim.apiKeyPlaceholder", "Enter your Maxim API key")}
 												disabled={!hasMaximAccess}
 												{...field}
 												className="pr-10"
@@ -87,6 +89,8 @@ export function MaximFormFragment({ initialConfig, onSave, onDelete, isDeleting 
 												className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
 												onClick={() => setShowApiKey(!showApiKey)}
 												disabled={!hasMaximAccess}
+												aria-label={showApiKey ? t("observability.maxim.hideApiKey", "Hide API key") : t("observability.maxim.showApiKey", "Show API key")}
+												data-testid="maxim-toggle-api-key-visibility"
 											>
 												{showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
 											</Button>
@@ -102,9 +106,9 @@ export function MaximFormFragment({ initialConfig, onSave, onDelete, isDeleting 
 							name="maxim_config.log_repo_id"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Log Repository ID (Optional)</FormLabel>
+									<FormLabel>{t("observability.maxim.logRepoId", "Log Repository ID (Optional)")}</FormLabel>
 									<FormControl>
-										<Input placeholder="Enter log repository ID" disabled={!hasMaximAccess} {...field} value={field.value ?? ""} />
+										<Input placeholder={t("observability.maxim.logRepoIdPlaceholder", "Enter log repository ID")} disabled={!hasMaximAccess} {...field} value={field.value ?? ""} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -117,13 +121,21 @@ export function MaximFormFragment({ initialConfig, onSave, onDelete, isDeleting 
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>
-										Request Headers <span className="text-muted-foreground font-normal">(Optional)</span>
+										{t("observability.maxim.requestHeaders", "Request Headers")}{" "}
+										<span className="text-muted-foreground font-normal">{t("observability.maxim.optional", "(Optional)")}</span>
 									</FormLabel>
 									<FormDescription>
-										Comma-separated list of request headers to capture and attach as trace tags. Supports exact names and wildcard patterns
-										(e.g. <code className="text-xs">x-custom-*</code> captures all headers with that prefix,{" "}
-										<code className="text-xs">*</code> captures all headers; note that <code className="text-xs">*</code> will capture
-										sensitive headers like Authorization).
+										<Trans
+											t={t}
+											i18nKey="observability.maxim.requestHeadersDescription"
+											defaults="Comma-separated list of request headers to capture and attach as trace tags. Supports exact names and wildcard patterns (e.g. <1>x-custom-*</1> captures all headers with that prefix, <2>*</2> captures all headers; note that <2>*</2> will capture sensitive headers like Authorization)."
+											components={{ 1: <code className="text-xs" />, 2: <code className="text-xs" /> }}
+										>
+											Comma-separated list of request headers to capture and attach as trace tags. Supports exact names and wildcard patterns
+											(e.g. <code className="text-xs">x-custom-*</code> captures all headers with that prefix,{" "}
+											<code className="text-xs">*</code> captures all headers; note that <code className="text-xs">*</code> will capture
+											sensitive headers like Authorization).
+										</Trans>
 									</FormDescription>
 									<FormControl>
 										<RequestHeadersTextarea
@@ -149,7 +161,7 @@ export function MaximFormFragment({ initialConfig, onSave, onDelete, isDeleting 
 						name="enabled"
 						render={({ field }) => (
 							<FormItem className="flex items-center gap-2 py-2">
-								<FormLabel className="text-muted-foreground text-sm font-medium">Enabled</FormLabel>
+										<FormLabel className="text-muted-foreground text-sm font-medium">{t("observability.common.enabled", "Enabled")}</FormLabel>
 								<FormControl>
 									<Switch
 										checked={field.value}
@@ -168,8 +180,8 @@ export function MaximFormFragment({ initialConfig, onSave, onDelete, isDeleting 
 								variant="outline"
 								onClick={onDelete}
 								disabled={isDeleting}
-								title="Delete connector"
-								aria-label="Delete connector"
+										title={t("observability.common.deleteConnector", "Delete connector")}
+										aria-label={t("observability.common.deleteConnector", "Delete connector")}
 							>
 								<Trash2 className="size-4" />
 							</Button>
@@ -189,23 +201,23 @@ export function MaximFormFragment({ initialConfig, onSave, onDelete, isDeleting 
 							}}
 							disabled={!hasMaximAccess || isLoading || !form.formState.isDirty}
 						>
-							Reset
+								{t("observability.common.reset", "Reset")}
 						</Button>
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<Button type="submit" disabled={!hasMaximAccess || !form.formState.isDirty} isLoading={isSaving}>
-										Save Maxim Configuration
+										{t("observability.maxim.saveConfiguration", "Save Maxim Configuration")}
 									</Button>
 								</TooltipTrigger>
 								{!form.formState.isDirty && (
 									<TooltipContent>
 										<p>
 											{!form.formState.isDirty
-												? "No changes made and validation errors present"
+												? t("observability.common.noChangesAndValidationErrors", "No changes made and validation errors present")
 												: !form.formState.isDirty
-													? "No changes made"
-													: "Please fix validation errors"}
+													? t("observability.common.noChangesMade", "No changes made")
+													: t("observability.common.fixValidationErrors", "Please fix validation errors")}
 										</p>
 									</TooltipContent>
 								)}

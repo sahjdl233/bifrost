@@ -8,6 +8,7 @@ import { useTheme } from "next-themes";
 import { ArrowLeft } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import BigQueryView from "./plugins/bigqueryView";
 import DatadogView from "./plugins/datadogView";
 import KafkaView from "./plugins/kafkaView";
@@ -101,6 +102,7 @@ const supportedPlatformsList = (resolvedTheme: string): SupportedPlatform[] => [
 ];
 
 export default function ObservabilityView() {
+	const { t } = useTranslation();
 	const isMobile = useIsMobile();
 	const dispatch = useAppDispatch();
 	const { data: plugins, isLoading } = useGetPluginsQuery();
@@ -157,7 +159,7 @@ export default function ObservabilityView() {
 				<div className="flex w-full flex-col gap-2 pb-10">
 					<div className="rounded-md bg-zinc-100/10 p-4 dark:bg-zinc-800/20">
 						<div className="flex flex-col gap-1">
-							<div className="text-muted-foreground mb-2 text-xs font-medium">Providers</div>
+							<div className="text-muted-foreground mb-2 text-xs font-medium">{t("observability.common.providers", "Providers")}</div>
 							{supportedPlatforms.map((tab) => (
 								<button
 									type="button"
@@ -191,7 +193,7 @@ export default function ObservabilityView() {
 									)}
 									{tab.disabled && (
 										<Badge variant="secondary" className="text-muted-foreground ml-auto text-[10px] font-medium">
-											{"Coming soon".toUpperCase()}
+										{t("observability.common.comingSoon", "Coming soon").toUpperCase()}
 										</Badge>
 									)}
 								</button>
@@ -203,7 +205,7 @@ export default function ObservabilityView() {
 			<div className={cn("min-w-0 w-full pt-4", mobileDetailOpen ? "block" : "hidden md:block")}>
 				<Button variant="ghost" size="sm" className="mb-2 md:hidden" onClick={() => setMobileDetailOpen(false)}>
 					<ArrowLeft className="size-4" />
-					Providers
+					{t("observability.common.providers", "Providers")}
 				</Button>
 				{selectedPluginId === "prometheus" && <PrometheusView />}
 				{selectedPluginId === "otel" && <OtelView />}

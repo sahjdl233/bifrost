@@ -2259,5 +2259,404 @@
 			"status": "状态",
 			"videoId": "视频 ID"
 		}
+	},
+	"observability": {
+		"common": {
+			"beta": {
+				"beta": "BETA"
+			},
+			"comingSoon": {
+				"comingSoon": "即将推出"
+			},
+			"copied": {
+				"copied": "已复制！"
+			},
+			"copy": {
+				"copy": "复制"
+			},
+			"deleteConnector": {
+				"deleteConnector": "删除连接器"
+			},
+			"enabled": {
+				"enabled": "已启用"
+			},
+			"error": {
+				"error": "错误"
+			},
+			"fixValidationErrors": {
+				"fixValidationErrors": "请先修复校验错误"
+			},
+			"noChangesAndValidationErrors": {
+				"noChangesAndValidationErrors": "未做修改且存在校验错误"
+			},
+			"noChangesMade": {
+				"noChangesMade": "未做修改"
+			},
+			"providers": {
+				"providers": "提供商"
+			},
+			"reset": {
+				"reset": "重置"
+			}
+		},
+		"maxim": {
+			"apiKey": {
+				"apiKey": "API Key"
+			},
+			"apiKeyPlaceholder": {
+				"apiKeyPlaceholder": "请输入 Maxim API Key"
+			},
+			"configUpdateFailed": {
+				"configUpdateFailed": "更新 Maxim 配置失败"
+			},
+			"configUpdated": {
+				"configUpdated": "Maxim 配置更新成功"
+			},
+			"configuration": {
+				"configuration": "配置"
+			},
+			"hideApiKey": {
+				"hideApiKey": "隐藏 API Key"
+			},
+			"logRepoHeaderDescription": {
+				"logRepoHeaderDescription": "你可以在请求头 <1>x-bf-log-repo-id</1> 中传入仓库 ID，将日志记录到指定仓库。"
+			},
+			"logRepoId": {
+				"logRepoId": "日志仓库 ID（可选）"
+			},
+			"logRepoIdPlaceholder": {
+				"logRepoIdPlaceholder": "请输入日志仓库 ID"
+			},
+			"optional": {
+				"optional": "（可选）"
+			},
+			"requestHeaders": {
+				"requestHeaders": "请求头"
+			},
+			"requestHeadersDescription": {
+				"requestHeadersDescription": "以逗号分隔的请求头列表，将被采集并作为 trace 标签附加。支持精确名称和通配符模式（例如 <1>x-custom-*</1> 可捕获此前缀的所有请求头，<2>*</2> 可捕获所有请求头；注意 <2>*</2> 也会捕获 Authorization 等敏感请求头）。"
+			},
+			"saveConfiguration": {
+				"saveConfiguration": "保存 Maxim 配置"
+			},
+			"showApiKey": {
+				"showApiKey": "显示 API Key"
+			}
+		},
+		"otel": {
+			"addProfile": {
+				"addProfile": "添加配置"
+			},
+			"commonHeaders": {
+				"commonHeaders": "公共请求头"
+			},
+			"commonHeadersDescription": {
+				"commonHeadersDescription": "同时应用于 trace 和 metrics 端点。"
+			},
+			"configUpdateFailed": {
+				"configUpdateFailed": "更新 OTEL 配置失败"
+			},
+			"configUpdated": {
+				"configUpdated": "OTEL 配置更新成功"
+			},
+			"configureTracing": {
+				"configureTracing": "配置链路追踪"
+			},
+			"disableContentLogging": {
+				"disableContentLogging": "关闭内容记录"
+			},
+			"disableContentLoggingDescription": {
+				"disableContentLoggingDescription": "启用后，消息内容（输入/输出消息、工具定义以及工具调用的参数/结果）不会写入导出的 span。仅将模型、Token 数、延迟等元数据发送至采集器。"
+			},
+			"disableRootSpanContent": {
+				"disableRootSpanContent": "关闭根 Span 内容"
+			},
+			"disableRootSpanContentDescription": {
+				"disableRootSpanContentDescription": "启用后，仅根 span 会丢弃输入/输出消息内容，其内部的生成（llm.call）span 仍保留完整内容。"
+			},
+			"disabled": {
+				"disabled": "已禁用"
+			},
+			"enableMetricsExport": {
+				"enableMetricsExport": "启用指标导出"
+			},
+			"enableMetricsExportDescription": {
+				"enableMetricsExportDescription": "将指标推送到 OTEL Collector，以便在集群部署中正确聚合"
+			},
+			"enableOverheadBreakdown": {
+				"enableOverheadBreakdown": "启用开销明细"
+			},
+			"enableProfile": {
+				"enableProfile": "启用配置"
+			},
+			"enableTraceExport": {
+				"enableTraceExport": "启用 Trace 导出"
+			},
+			"enableTraceExportDescription": {
+				"enableTraceExportDescription": "将 span 导出到 OTLP 采集器。仅导出指标时可关闭此项。"
+			},
+			"exportTimeoutDescription": {
+				"exportTimeoutDescription": "单次 trace 导出的最长等待时间（1-60 秒）。超过该上限的 trace 会被丢弃且不会重试，因此采集器不可达时不会拖慢请求处理。"
+			},
+			"exportTimeoutSeconds": {
+				"exportTimeoutSeconds": "导出超时（秒）"
+			},
+			"format": {
+				"format": "格式"
+			},
+			"groupTracesBySession": {
+				"groupTracesBySession": "按会话分组 Trace"
+			},
+			"groupTracesBySessionDescription": {
+				"groupTracesBySessionDescription": "启用后，共享同一 x-bf-session-id 请求头的请求会被归入同一条 trace，每个请求作为顶层同级 span 呈现。携带入站 W3C traceparent 的请求仍保留在各自的分布式 trace 中，不受影响。"
+			},
+			"insecureSkipTls": {
+				"insecureSkipTls": "不安全（跳过 TLS）"
+			},
+			"insecureSkipTlsDescription": {
+				"insecureSkipTlsDescription": "跳过 TLS 校验。关闭此项即可使用系统根证书或自定义 CA 证书建立 TLS 连接。"
+			},
+			"metricsEndpoint": {
+				"metricsEndpoint": "指标端点"
+			},
+			"metricsHeaders": {
+				"metricsHeaders": "指标请求头"
+			},
+			"metricsHeadersDescription": {
+				"metricsHeadersDescription": "仅应用于指标端点，在公共请求头之外附加（例如 Databricks 表名）。"
+			},
+			"metricsOnly": {
+				"metricsOnly": "仅指标"
+			},
+			"metricsTab": {
+				"metricsTab": "指标"
+			},
+			"optional": {
+				"optional": "（可选）"
+			},
+			"otlpCollectorUrl": {
+				"otlpCollectorUrl": "OTLP 采集器 URL"
+			},
+			"overheadBreakdown": {
+				"overheadBreakdown": "开销明细"
+			},
+			"overheadBreakdownDescription": {
+				"overheadBreakdownDescription": "以直方图形式导出各组件的 Bifrost 开销延迟。"
+			},
+			"profileFallbackName": {
+				"profileFallbackName": "配置 {{index}}"
+			},
+			"protocol": {
+				"protocol": "协议"
+			},
+			"protocolDescription": {
+				"protocolDescription": "trace 与指标导出共用的传输方式。"
+			},
+			"protocolGrpc": {
+				"protocolGrpc": "GRPC"
+			},
+			"protocolHttp": {
+				"protocolHttp": "HTTP"
+			},
+			"pushIntervalDescription": {
+				"pushIntervalDescription": "推送指标的间隔（1-300 秒）"
+			},
+			"pushIntervalSeconds": {
+				"pushIntervalSeconds": "推送间隔（秒）"
+			},
+			"removeProfile": {
+				"removeProfile": "移除配置"
+			},
+			"requestHeaders": {
+				"requestHeaders": "请求头"
+			},
+			"requestHeadersDescription": {
+				"requestHeadersDescription": "以逗号分隔的请求头列表，将被采集并作为 span 属性输出。支持精确名称和通配符模式（例如 <1>x-custom-*</1> 可捕获此前缀的所有请求头，<2>*</2> 可捕获所有请求头；注意 <2>*</2> 也会捕获 Authorization 等敏感请求头）。"
+			},
+			"saveConfiguration": {
+				"saveConfiguration": "保存 OTEL 配置"
+			},
+			"selectProtocol": {
+				"selectProtocol": "选择协议"
+			},
+			"selectTraceType": {
+				"selectTraceType": "选择 Trace 类型"
+			},
+			"serviceName": {
+				"serviceName": "服务名称"
+			},
+			"serviceNameDescription": {
+				"serviceNameDescription": "若留空，服务名称将设为 \"bifrost\""
+			},
+			"tlsCaCertPath": {
+				"tlsCaCertPath": "TLS CA 证书路径"
+			},
+			"tlsCaCertPathDescription": {
+				"tlsCaCertPathDescription": "Bifrost 服务器上 CA 证书的文件路径。留空则使用系统根证书。"
+			},
+			"traceHeaders": {
+				"traceHeaders": "Trace 请求头"
+			},
+			"traceHeadersDescription": {
+				"traceHeadersDescription": "仅应用于 trace 端点，在公共请求头之外附加。"
+			},
+			"traceTypeGenaiExtension": {
+				"traceTypeGenaiExtension": "OTel GenAI 扩展（推荐）"
+			},
+			"traceTypeOpenInference": {
+				"traceTypeOpenInference": "Arize OpenInference"
+			},
+			"traceTypeVercel": {
+				"traceTypeVercel": "Vercel AI SDK"
+			},
+			"tracesTab": {
+				"tracesTab": "链路追踪"
+			}
+		},
+		"prometheus": {
+			"addBasicAuth": {
+				"addBasicAuth": "添加 Basic Auth"
+			},
+			"basicAuthentication": {
+				"basicAuthentication": "Basic Auth 认证"
+			},
+			"configUpdateFailed": {
+				"configUpdateFailed": "更新 Prometheus 配置失败"
+			},
+			"configUpdated": {
+				"configUpdated": "Prometheus 配置更新成功"
+			},
+			"fixErrorsBeforeSaving": {
+				"fixErrorsBeforeSaving": "保存前请先修复校验错误"
+			},
+			"fixErrorsInOtherTab": {
+				"fixErrorsInOtherTab": "保存前请先修复 {{tab}} 标签页中的校验错误"
+			},
+			"instanceId": {
+				"instanceId": "实例 ID"
+			},
+			"instanceIdPlaceholder": {
+				"instanceIdPlaceholder": "默认根据主机名自动生成"
+			},
+			"instanceIdTooltip": {
+				"instanceIdTooltip": "用于在指标中标识当前 Bifrost 实例。若不设置，将自动使用主机名。"
+			},
+			"jobName": {
+				"jobName": "任务名称"
+			},
+			"jobNameDescription": {
+				"jobNameDescription": "指标的 job 标签"
+			},
+			"metricsEndpoint": {
+				"metricsEndpoint": "指标端点"
+			},
+			"metricsEndpointDescription": {
+				"metricsEndpointDescription": "配置 Prometheus 服务器以抓取此端点。仅在启用基于拉取的抓取时提供。"
+			},
+			"multiNodeAlert": {
+				"multiNodeAlert": "如果运行多个 Bifrost 节点，请使用 push gateway 以获得准确指标。基于拉取的 /metrics 抓取可能会遗漏负载均衡器后的节点。"
+			},
+			"noChangesInTab": {
+				"noChangesInTab": "此标签页未做修改"
+			},
+			"overheadBreakdown": {
+				"overheadBreakdown": "开销明细"
+			},
+			"overheadBreakdownDescription": {
+				"overheadBreakdownDescription": "以直方图形式导出各组件的 Bifrost 开销延迟。"
+			},
+			"password": {
+				"password": "密码"
+			},
+			"pullBasedScraping": {
+				"pullBasedScraping": "基于拉取的抓取"
+			},
+			"pullBasedScrapingDescription": {
+				"pullBasedScrapingDescription": "Prometheus 可从 /metrics 端点抓取指标"
+			},
+			"pushBasedDescription": {
+				"pushBasedDescription": "将指标推送到 Prometheus Push Gateway，以便在集群部署中正确聚合"
+			},
+			"pushBasedPushGateway": {
+				"pushBasedPushGateway": "基于推送（Push Gateway）"
+			},
+			"pushGatewayUrl": {
+				"pushGatewayUrl": "Push Gateway URL"
+			},
+			"pushGatewayUrlDescription": {
+				"pushGatewayUrlDescription": "Prometheus Push Gateway 的 URL"
+			},
+			"pushIntervalDescription": {
+				"pushIntervalDescription": "推送间隔（1-300 秒）"
+			},
+			"pushIntervalSeconds": {
+				"pushIntervalSeconds": "推送间隔（秒）"
+			},
+			"removeBasicAuth": {
+				"removeBasicAuth": "移除 Basic Auth"
+			},
+			"saveConfiguration": {
+				"saveConfiguration": "保存 Prometheus 配置"
+			},
+			"tabPullBased": {
+				"tabPullBased": "基于拉取"
+			},
+			"tabPushBased": {
+				"tabPushBased": "基于推送"
+			},
+			"userLabels": {
+				"userLabels": "用户标签"
+			},
+			"userLabelsDescription": {
+				"userLabelsDescription": "为指标添加用户数据标签"
+			},
+			"username": {
+				"username": "用户名"
+			}
+		},
+		"tracing": {
+			"cancel": {
+				"cancel": "取消"
+			},
+			"configureDescription": {
+				"configureDescription": "选择要导出到 {{destination}} 的 span。禁用某个插件会从链路追踪中移除其 span，但不会影响请求执行。"
+			},
+			"configureTitle": {
+				"configureTitle": "配置链路追踪"
+			},
+			"destinationNotConfigured": {
+				"destinationNotConfigured": "{{destination}} 尚未配置。请先保存其配置，然后再配置插件链路追踪。"
+			},
+			"noPermission": {
+				"noPermission": "你没有修改可观测性设置的权限"
+			},
+			"overhead": {
+				"overhead": "开销"
+			},
+			"overheadLatencySpans": {
+				"overheadLatencySpans": "开销延迟 span"
+			},
+			"overheadLatencySpansDescription": {
+				"overheadLatencySpansDescription": "内部计时 span（初始化、密钥选择、流水线阶段）。默认关闭。"
+			},
+			"pluginListLoading": {
+				"pluginListLoading": "插件列表仍在加载中，请稍候再保存。"
+			},
+			"plugins": {
+				"plugins": "插件"
+			},
+			"save": {
+				"save": "保存"
+			},
+			"saved": {
+				"saved": "链路追踪配置已保存"
+			},
+			"spanFilterPrecedence": {
+				"spanFilterPrecedence": "如果在 config.json 的 <1>{{pluginName}}</1> 插件配置中设置了 <1>plugin_span_filter</1>，重启 Bifrost 后将以该配置优先于这些设置。"
+			},
+			"toggleAll": {
+				"toggleAll": "切换全部插件的链路追踪"
+			}
+		}
 	}
 }
