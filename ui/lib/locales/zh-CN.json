@@ -2400,5 +2400,40 @@
       "spanFilterPrecedence": "如果在 config.json 的 <1>{{pluginName}}</1> 插件配置中设置了 <1>plugin_span_filter</1>，重启 Bifrost 后将以该配置优先于这些设置。",
       "toggleAll": "切换全部插件的链路追踪"
     }
-  }
+  },
+   "routingRules": {
+        "manageRoutingRules": "管理基于CEL的路由规则，以实现智能请求路由",
+        "viewTree": "查看树",
+        "addRule": "添加规则",
+        "name": "名称",
+        "targets": "目标",
+        "scope": "范围",
+        "priority": "优先级",
+        "expression": "表达式",
+        "enabled": "启用",
+        "actions": "操作",
+        "status": "状态",
+        "noMatchingRules": "找不到匹配的路由规则。",
+        "page": "页面",
+        "deleteRoutingRule": "删除路由规则",
+        "cancel": "取消",
+        "description": "描述",
+        "enableRule": "启用规则",
+        "ruleActive": "规则将处于活动状态并应用于匹配的请求",
+        "chainRule": "链式规则",
+        "lowerNumbers": "更小的数字 = 更高的优先级 (0 是最高的)",
+        "routingTargets": "路由目标",
+        "fallbacks": "后备",
+        "noFallbacksConfigured": "没有配置后备",
+        "fallbacksUsage": "后备将按照定义的顺序使用",
+        "largerScreenNeeded": "路由树需要更大的屏幕",
+        "mobileReview": "使用路由规则列表来查看和修改移动设备上的规则。",
+        "loadFailed": "加载路由规则失败",
+        "noRulesToDisplay": "没有路由规则可显示",
+        "routingTree": "路由树",
+        "staticChain": "静态链",
+        "dynamicChain": "动态链",
+        "originalProviderAndModel": "原始提供者和模型",
+        "providerModelHeadersParamsLimits": "提供者 · 模型 · 头信息 · 参数 · 限制"
+    }
 }

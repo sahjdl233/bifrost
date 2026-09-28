@@ -2400,5 +2400,40 @@
 		"spanFilterPrecedence": "If <1>plugin_span_filter</1> is set in the <1>{{pluginName}}</1> plugin config in config.json, it takes precedence over these settings after restarting Bifrost.",
 		"toggleAll": "Toggle all plugin tracing"
 		}
-	}
+	},
+	"routingRules": {
+        "manageRoutingRules": "Manage CEL-based routing rules for intelligent request routing across providers",
+        "viewTree": "View Tree",
+        "addRule": "Add Rule",
+        "name": "Name",
+        "targets": "Targets",
+        "scope": "Scope",
+        "priority": "Priority",
+        "expression": "Expression",
+        "enabled": "Enabled",
+        "actions": "Actions",
+        "status": "Status",
+        "noMatchingRules": "No matching routing rules found.",
+        "page": "Page",
+        "deleteRoutingRule": "Delete Routing Rule",
+        "cancel": "Cancel",
+        "description": "Description",
+        "enableRule": "Enable Rule",
+        "ruleActive": "Rule will be active and applied to matching requests",
+        "chainRule": "Chain Rule",
+        "lowerNumbers": "Lower numbers = higher priority (0 is highest)",
+        "routingTargets": "Routing Targets",
+        "fallbacks": "Fallbacks",
+        "noFallbacksConfigured": "No fallbacks configured",
+        "fallbacksUsage": "Fallbacks will be used in the order they are defined",
+        "largerScreenNeeded": "Routing tree needs a larger screen",
+        "mobileReview": "Use the routing rules list to review and modify rules on mobile.",
+        "loadFailed": "Failed to load routing rules",
+        "noRulesToDisplay": "No routing rules to display",
+        "routingTree": "Routing Tree",
+        "staticChain": "Static chain",
+        "dynamicChain": "Dynamic chain",
+        "originalProviderAndModel": "original provider & model",
+        "providerModelHeadersParamsLimits": "provider · model · headers · params · limits"
+    }
 }
