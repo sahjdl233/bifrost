@@ -1,0 +1,424 @@
+=== ui/app/workspace/routing-rules/views/routingRulesTable.tsx ===
+   1: /**
+   2:  * Routing Rules Table
+   3:  * Displays all routing rules with CRUD actions
+   4:  */
+   5: 
+   6: import {
+   7: 	AlertDialog,
+   8: 	AlertDialogAction,
+   9: 	AlertDialogCancel,
+  10: 	AlertDialogContent,
+  11: 	AlertDialogDescription,
+  12: 	AlertDialogFooter,
+  13: 	AlertDialogHeader,
+  14: 	AlertDialogTitle,
+  15: } from "@/components/ui/alertDialog";
+  16: import { Badge } from "@/components/ui/badge";
+  17: import { Button } from "@/components/ui/button";
+  18: import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdownMenu";
+  19: import { Input } from "@/components/ui/input";
+  20: import { Switch } from "@/components/ui/switch";
+  21: import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+  22: import { PIN_SHADOW_RIGHT } from "@/components/table/columnPinning";
+  23: import { ProviderIconType, RenderProviderIcon } from "@/lib/constants/icons";
+  24: import { getProviderLabel } from "@/lib/constants/logs";
+  25: import { getErrorMessage } from "@/lib/store";
+  26: import { useDeleteRoutingRuleMutation, useUpdateRoutingRuleMutation } from "@/lib/store/apis/routingRulesApi";
+  27: import { RoutingRule, RoutingTarget } from "@/lib/types/routingRules";
+  28: import { getScopeLabel } from "@/lib/utils/labels";
+  29: import { getPriorityBadgeClass, truncateCELExpression } from "@/lib/utils/routingRules";
+  30: import { ChevronLeft, ChevronRight, Edit, MoreHorizontal, Search, Trash2 } from "lucide-react";
+  31: import { useState } from "react";
+  32: import { toast } from "sonner";
+  33: 
+  34: function RoutingRuleActionsMenu({
+  35: 	rule,
+  36: 	canUpdate,
+  37: 	canDelete,
+  38: 	onEdit,
+  39: 	onDelete,
+  40: }: {
+  41: 	rule: RoutingRule;
+  42: 	canUpdate: boolean;
+  43: 	canDelete: boolean;
+  44: 	onEdit: (rule: RoutingRule) => void;
+  45: 	onDelete: (ruleId: string) => void;
+  46: }) {
+  47: 	const [isOpen, setIsOpen] = useState(false);
+  48: 
+  49: 	return (
+  50: 		<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+  51: 			<DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+  52: 				<Button
+  53: 					variant="ghost"
+  54: 					size="icon"
+  55: 					className="h-8 w-8"
+  56: 					aria-label={`Actions for routing rule ${rule.name}`}
+  57: 					data-testid={`routing-rule-actions-${rule.id}-btn`}
+  58: 				>
+  59: 					<MoreHorizontal className="h-4 w-4" />
+  60: 				</Button>
+  61: 			</DropdownMenuTrigger>
+  62: 			<DropdownMenuContent align="end">
+  63: 				<DropdownMenuItem
+  64: 					className="cursor-pointer"
+  65: 					disabled={!canUpdate}
+  66: 					data-testid={`routing-rule-edit-${rule.id}-btn`}
+  67: 					onSelect={(e) => {
+  68: 						e.preventDefault();
+  69: 						onEdit(rule);
+  70: 						setIsOpen(false);
+  71: 					}}
+  72: 				>
+  73: 					<Edit className="h-4 w-4" />
+  74: 					Edit
+  75: 				</DropdownMenuItem>
+  76: 				<DropdownMenuItem
+  77: 					variant="destructive"
+  78: 					className="cursor-pointer"
+  79: 					disabled={!canDelete}
+  80: 					data-testid={`routing-rule-delete-${rule.id}-btn`}
+  81: 					onSelect={(e) => {
+  82: 						e.preventDefault();
+  83: 						onDelete(rule.id);
+  84: 						setIsOpen(false);
+  85: 					}}
+  86: 				>
+  87: 					<Trash2 className="h-4 w-4" />
+  88: 					Delete
+  89: 				</DropdownMenuItem>
+  90: 			</DropdownMenuContent>
+  91: 		</DropdownMenu>
+  92: 	);
+  93: }
+  94: 
+  95: interface RoutingRulesTableProps {
+  96: 	rules: RoutingRule[] | undefined;
+  97: 	totalCount: number;
+  98: 	isLoading: boolean;
+  99: 	onEdit: (rule: RoutingRule) => void;
+ 100: 	onRowClick: (rule: RoutingRule) => void;
+ 101: 	/** When false, delete button is hidden and deletion is disabled (e.g. for read-only users). */
+ 102: 	canDelete?: boolean;
+ 103: 	/** When false, enabled toggle is disabled (e.g. for read-only users). */
+ 104: 	canUpdate?: boolean;
+ 105: 	search: string;
+ 106: 	onSearchChange: (value: string) => void;
+ 107: 	offset: number;
+ 108: 	limit: number;
+ 109: 	onOffsetChange: (offset: number) => void;
+ 110: 	/** Page-level actions rendered at the right end of the same row as the search. */
+ 111: 	actions?: React.ReactNode;
+ 112: }
+ 113: 
+ 114: export function RoutingRulesTable({
+ 115: 	rules,
+ 116: 	totalCount,
+ 117: 	isLoading,
+ 118: 	onEdit,
+ 119: 	onRowClick,
+ 120: 	canDelete = false,
+ 121: 	canUpdate = false,
+ 122: 	search,
+ 123: 	onSearchChange,
+ 124: 	offset,
+ 125: 	limit,
+ 126: 	onOffsetChange,
+ 127: 	actions,
+ 128: }: RoutingRulesTableProps) {
+ 129: 	const [deleteRuleId, setDeleteRuleId] = useState<string | null>(null);
+ 130: 	const [deleteRoutingRule, { isLoading: isDeleting }] = useDeleteRoutingRuleMutation();
+ 131: 	const [updateRoutingRule] = useUpdateRoutingRuleMutation();
+ 132: 
+ 133: 	const handleDelete = async () => {
+ 134: 		if (!canDelete || !deleteRuleId) return;
+ 135: 
+ 136: 		try {
+ 137: 			await deleteRoutingRule(deleteRuleId).unwrap();
+ 138: 			toast.success("Routing rule deleted successfully");
+ 139: 			setDeleteRuleId(null);
+ 140: 		} catch (error: unknown) {
+ 141: 			toast.error(getErrorMessage(error));
+ 142: 		}
+ 143: 	};
+ 144: 
+ 145: 	if (isLoading) {
+ 146: 		return (
+ 147: 			<div className="rounded-sm border">
+ 148: 				<Table>
+ 149: 					<TableHeader>
+ 150: 						<TableRow>
+ 151: 							<TableHead>Name</TableHead>
+ 152: 							<TableHead>Targets</TableHead>
+ 153: 							<TableHead>Scope</TableHead>
+ 154: 							<TableHead className="text-right">Priority</TableHead>
+ 155: 							<TableHead>Expression</TableHead>
+ 156: 							<TableHead>Enabled</TableHead>
+ 157: 							<TableHead className="text-right">Actions</TableHead>
+ 158: 						</TableRow>
+ 159: 					</TableHeader>
+ 160: 					<TableBody>
+ 161: 						{[...Array(5)].map((_, i) => (
+ 162: 							<TableRow key={i}>
+ 163: 								<TableCell colSpan={7} className="h-10">
+ 164: 									<div className="bg-muted h-2 w-32 animate-pulse rounded" />
+ 165: 								</TableCell>
+ 166: 							</TableRow>
+ 167: 						))}
+ 168: 					</TableBody>
+ 169: 				</Table>
+ 170: 			</div>
+ 171: 		);
+ 172: 	}
+ 173: 
+ 174: 	const sortedRules = rules ? [...rules].sort((a, b) => a.priority - b.priority) : [];
+ 175: 	const ruleToDelete = sortedRules.find((r) => r.id === deleteRuleId);
+ 176: 
+ 177: 	return (
+ 178: 		<>
+ 179: 			{/* Toolbar: Search + Actions */}
+ 180: 			<div className="mb-4 flex flex-wrap items-center gap-3">
+ 181: 				<div className="relative max-w-sm flex-1">
+ 182: 					<Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+ 183: 					<Input
+ 184: 						aria-label="Search routing rules by name"
+ 185: 						placeholder="Search by name..."
+ 186: 						value={search}
+ 187: 						onChange={(e) => onSearchChange(e.target.value)}
+ 188: 						className="pl-9"
+ 189: 						data-testid="routing-rules-search-input"
+ 190: 					/>
+ 191: 				</div>
+ 192: 				{actions && <div className="flex items-center gap-2 sm:ml-auto">{actions}</div>}
+ 193: 			</div>
+ 194: 
+ 195: 			<div className="mb-2 overflow-hidden rounded-sm border">
+ 196: 				<Table containerClassName="h-full overflow-auto">
+ 197: 					<TableHeader className="bg-muted sticky top-0 z-10">
+ 198: 						<TableRow className="bg-muted/50">
+ 199: 							<TableHead className="font-semibold">Name</TableHead>
+ 200: 							<TableHead className="font-semibold">Targets</TableHead>
+ 201: 							<TableHead className="font-semibold">Scope</TableHead>
+ 202: 							<TableHead className="text-right font-semibold">Priority</TableHead>
+ 203: 							<TableHead className="font-semibold">Expression</TableHead>
+ 204: 							<TableHead className="font-semibold">Status</TableHead>
+ 205: 							<TableHead className={`bg-muted sticky right-0 z-30 w-[50px] text-right font-semibold ${PIN_SHADOW_RIGHT}`}>
+ 206: 								Actions
+ 207: 							</TableHead>
+ 208: 						</TableRow>
+ 209: 					</TableHeader>
+ 210: 					<TableBody>
+ 211: 						{sortedRules.length === 0 ? (
+ 212: 							<TableRow>
+ 213: 								<TableCell colSpan={7} className="h-24 text-center">
+ 214: 									<span className="text-muted-foreground text-sm">No matching routing rules found.</span>
+ 215: 								</TableCell>
+ 216: 							</TableRow>
+ 217: 						) : (
+ 218: 							sortedRules.map((rule) => (
+ 219: 								<TableRow
+ 220: 									key={rule.id}
+ 221: 									className="group hover:bg-muted/50 cursor-pointer transition-colors"
+ 222: 									onClick={() => onRowClick(rule)}
+ 223: 								>
+ 224: 									<TableCell className="font-medium">
+ 225: 										<div className="flex flex-col gap-1">
+ 226: 											<span className="max-w-xs truncate">{rule.name}</span>
+ 227: 											{rule.description && (
+ 228: 												<span data-testid="routing-rule-description" className="text-muted-foreground max-w-xs truncate text-xs">
+ 229: 													{rule.description}
+ 230: 												</span>
+ 231: 											)}
+ 232: 										</div>
+ 233: 									</TableCell>
+ 234: 									<TableCell>
+ 235: 										<TargetsSummary targets={rule.targets || []} />
+ 236: 									</TableCell>
+ 237: 									<TableCell>
+ 238: 										<Badge variant="secondary">{getScopeLabel(rule.scope)}</Badge>
+ 239: 									</TableCell>
+ 240: 									<TableCell className="text-right">
+ 241: 										<div className={`inline-block rounded px-2.5 py-1 text-xs font-medium ${getPriorityBadgeClass()}`}>{rule.priority}</div>
+ 242: 									</TableCell>
+ 243: 									<TableCell>
+ 244: 										<span className="text-muted-foreground block max-w-xs truncate font-mono text-xs" title={rule.cel_expression}>
+ 245: 											{truncateCELExpression(rule.cel_expression)}
+ 246: 										</span>
+ 247: 									</TableCell>
+ 248: 									<TableCell onClick={(e) => e.stopPropagation()}>
+ 249: 										<Switch
+ 250: 											data-testid={`routing-rule-enabled-${rule.id}-switch`}
+ 251: 											checked={rule.enabled ?? true}
+ 252: 											size="md"
+ 253: 											disabled={!canUpdate}
+ 254: 											onAsyncCheckedChange={async (checked) => {
+ 255: 												await updateRoutingRule({
+ 256: 													id: rule.id,
+ 257: 													data: { enabled: checked },
+ 258: 												})
+ 259: 													.unwrap()
+ 260: 													.then(() => {
+ 261: 														toast.success(`Rule ${checked ? "enabled" : "disabled"} successfully`);
+ 262: 													})
+ 263: 													.catch((err) => {
+ 264: 														toast.error("Failed to update rule", {
+ 265: 															description: getErrorMessage(err),
+ 266: 														});
+ 267: 													});
+ 268: 											}}
+ 269: 										/>
+ 270: 									</TableCell>
+ 271: 									<TableCell
+ 272: 										className={`group-hover:bg-muted dark:bg-card dark:group-hover:bg-muted sticky right-0 z-20 bg-white text-right ${PIN_SHADOW_RIGHT}`}
+ 273: 										onClick={(e) => e.stopPropagation()}
+ 274: 									>
+ 275: 										<div className="flex items-center justify-center">
+ 276: 											<RoutingRuleActionsMenu
+ 277: 												rule={rule}
+ 278: 												canUpdate={canUpdate}
+ 279: 												canDelete={canDelete}
+ 280: 												onEdit={onEdit}
+ 281: 												onDelete={setDeleteRuleId}
+ 282: 											/>
+ 283: 										</div>
+ 284: 									</TableCell>
+ 285: 								</TableRow>
+ 286: 							))
+ 287: 						)}
+ 288: 					</TableBody>
+ 289: 				</Table>
+ 290: 			</div>
+ 291: 
+ 292: 			{/* Pagination */}
+ 293: 			{totalCount > 0 && (
+ 294: 				<div className="flex shrink-0 items-center justify-between text-xs" data-testid="pagination">
+ 295: 					<div className="text-muted-foreground flex items-center gap-2">
+ 296: 						{(offset + 1).toLocaleString()}-{Math.min(offset + limit, totalCount).toLocaleString()} of {totalCount.toLocaleString()} entries
+ 297: 					</div>
+ 298: 
+ 299: 					<div className="flex items-center gap-2">
+ 300: 						<Button
+ 301: 							variant="ghost"
+ 302: 							size="sm"
+ 303: 							onClick={() => onOffsetChange(Math.max(0, offset - limit))}
+ 304: 							disabled={offset === 0}
+ 305: 							data-testid="routing-rules-pagination-prev-btn"
+ 306: 							aria-label="Previous page"
+ 307: 						>
+ 308: 							<ChevronLeft className="size-3" />
+ 309: 						</Button>
+ 310: 
+ 311: 						<div className="flex items-center gap-1">
+ 312: 							<span>Page</span>
+ 313: 							<span>{Math.floor(offset / limit) + 1}</span>
+ 314: 							<span>of {Math.ceil(totalCount / limit)}</span>
+ 315: 						</div>
+ 316: 
+ 317: 						<Button
+ 318: 							variant="ghost"
+ 319: 							size="sm"
+ 320: 							onClick={() => onOffsetChange(offset + limit)}
+ 321: 							disabled={offset + limit >= totalCount}
+ 322: 							data-testid="routing-rules-pagination-next-btn"
+ 323: 							aria-label="Next page"
+ 324: 						>
+ 325: 							<ChevronRight className="size-3" />
+ 326: 						</Button>
+ 327: 					</div>
+ 328: 				</div>
+ 329: 			)}
+ 330: 
+ 331: 			<AlertDialog open={!!deleteRuleId} onOpenChange={(open) => !open && setDeleteRuleId(null)}>
+ 332: 				<AlertDialogContent>
+ 333: 					<AlertDialogHeader>
+ 334: 						<AlertDialogTitle>Delete Routing Rule</AlertDialogTitle>
+ 335: 						<AlertDialogDescription>
+ 336: 							Are you sure you want to delete &quot;{ruleToDelete?.name}&quot;? This action cannot be undone.
+ 337: 						</AlertDialogDescription>
+ 338: 					</AlertDialogHeader>
+ 339: 					<AlertDialogFooter>
+ 340: 						<AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+ 341: 						<AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+ 342: 							{isDeleting ? "Deleting..." : "Delete"}
+ 343: 						</AlertDialogAction>
+ 344: 					</AlertDialogFooter>
+ 345: 				</AlertDialogContent>
+ 346: 			</AlertDialog>
+ 347: 		</>
+ 348: 	);
+ 349: }
+ 350: 
+ 351: function TargetsSummary({ targets }: { targets: RoutingTarget[] }) {
+ 352: 	if (!targets || targets.length === 0) {
+ 353: 		return <span className="text-muted-foreground text-sm">-</span>;
+ 354: 	}
+ 355: 
+ 356: 	const first = targets[0];
+ 357: 	const label = [first.provider ? getProviderLabel(first.provider) : "Any", first.model || "Any model"].join(" / ");
+ 358: 
+ 359: 	return (
+ 360: 		<div className="flex flex-col gap-1">
+ 361: 			<div className="flex items-center gap-1.5">
+ 362: 				{first.provider && <RenderProviderIcon provider={first.provider as ProviderIconType} size="sm" className="h-4 w-4 shrink-0" />}
+ 363: 				<span className="max-w-[160px] truncate text-sm">{label}</span>
+ 364: 			</div>
+ 365: 			{targets.length > 1 && (
+ 366: 				<span className="text-muted-foreground text-xs">
+ 367: 					+{targets.length - 1} more target{targets.length > 2 ? "s" : ""}
+ 368: 				</span>
+ 369: 			)}
+ 370: 		</div>
+ 371: 	);
+ 372: }
+=== ui/app/workspace/routing-rules/views/routingRulesEmptyState.tsx ===
+   1: import { Button } from "@/components/ui/button";
+   2: import { Route } from "lucide-react";
+   3: import { ArrowUpRight } from "lucide-react";
+   4: 
+   5: const ROUTING_RULES_DOCS_URL = "https://docs.getbifrost.ai/providers/routing-rules";
+   6: 
+   7: interface RoutingRulesEmptyStateProps {
+   8: 	onAddClick: () => void;
+   9: 	canCreate?: boolean;
+  10: }
+  11: 
+  12: export function RoutingRulesEmptyState({ onAddClick, canCreate = true }: RoutingRulesEmptyStateProps) {
+  13: 	return (
+  14: 		<div
+  15: 			className="flex min-h-[80vh] w-full flex-col items-center justify-center gap-4 py-16 text-center"
+  16: 			data-testid="routing-rules-empty-state"
+  17: 		>
+  18: 			<div className="text-muted-foreground">
+  19: 				<Route className="h-[5.5rem] w-[5.5rem]" strokeWidth={1} />
+  20: 			</div>
+  21: 			<div className="flex flex-col gap-1">
+  22: 				<h1 className="text-muted-foreground text-xl font-medium">Routing rules direct requests using CEL conditions</h1>
+  23: 				<div className="text-muted-foreground mx-auto mt-2 w-full max-w-[600px] text-sm font-normal">
+  24: 					Create CEL-based rules to route requests by model, provider, budget, or custom attributes. Control which provider or model handles
+  25: 					each request.
+  26: 				</div>
+  27: 				<div className="mx-auto mt-6 flex flex-row flex-wrap items-center justify-center gap-2">
+  28: 					<Button
+  29: 						variant="outline"
+  30: 						aria-label="Read more about routing rules (opens in new tab)"
+  31: 						data-testid="routing-rules-empty-read-more"
+  32: 						onClick={() => {
+  33: 							window.open(`${ROUTING_RULES_DOCS_URL}?utm_source=bfd`, "_blank", "noopener,noreferrer");
+  34: 						}}
+  35: 					>
+  36: 						Read more <ArrowUpRight className="text-muted-foreground h-3 w-3" />
+  37: 					</Button>
+  38: 					<Button
+  39: 						aria-label="Create your first routing rule"
+  40: 						data-testid="create-routing-rule-btn"
+  41: 						onClick={onAddClick}
+  42: 						disabled={!canCreate}
+  43: 					>
+  44: 						New Rule
+  45: 					</Button>
+  46: 				</div>
+  47: 			</div>
+  48: 		</div>
+  49: 	);
+  50: }

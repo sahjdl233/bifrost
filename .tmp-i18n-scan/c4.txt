@@ -1,0 +1,150 @@
+ 100: 	onRowClick: (rule: RoutingRule) => void;
+ 101: 	/** When false, delete button is hidden and deletion is disabled (e.g. for read-only users). */
+ 102: 	canDelete?: boolean;
+ 103: 	/** When false, enabled toggle is disabled (e.g. for read-only users). */
+ 104: 	canUpdate?: boolean;
+ 105: 	search: string;
+ 106: 	onSearchChange: (value: string) => void;
+ 107: 	offset: number;
+ 108: 	limit: number;
+ 109: 	onOffsetChange: (offset: number) => void;
+ 110: 	/** Page-level actions rendered at the right end of the same row as the search. */
+ 111: 	actions?: React.ReactNode;
+ 112: }
+ 113: 
+ 114: export function RoutingRulesTable({
+ 115: 	rules,
+ 116: 	totalCount,
+ 117: 	isLoading,
+ 118: 	onEdit,
+ 119: 	onRowClick,
+ 120: 	canDelete = false,
+ 121: 	canUpdate = false,
+ 122: 	search,
+ 123: 	onSearchChange,
+ 124: 	offset,
+ 125: 	limit,
+ 126: 	onOffsetChange,
+ 127: 	actions,
+ 128: }: RoutingRulesTableProps) {
+ 129: 	const [deleteRuleId, setDeleteRuleId] = useState<string | null>(null);
+ 130: 	const [deleteRoutingRule, { isLoading: isDeleting }] = useDeleteRoutingRuleMutation();
+ 131: 	const [updateRoutingRule] = useUpdateRoutingRuleMutation();
+ 132: 
+ 133: 	const handleDelete = async () => {
+ 134: 		if (!canDelete || !deleteRuleId) return;
+ 135: 
+ 136: 		try {
+ 137: 			await deleteRoutingRule(deleteRuleId).unwrap();
+ 138: 			toast.success("Routing rule deleted successfully");
+ 139: 			setDeleteRuleId(null);
+ 140: 		} catch (error: unknown) {
+ 141: 			toast.error(getErrorMessage(error));
+ 142: 		}
+ 143: 	};
+ 144: 
+ 145: 	if (isLoading) {
+ 146: 		return (
+ 147: 			<div className="rounded-sm border">
+ 148: 				<Table>
+ 149: 					<TableHeader>
+ 150: 						<TableRow>
+ 151: 							<TableHead>Name</TableHead>
+ 152: 							<TableHead>Targets</TableHead>
+ 153: 							<TableHead>Scope</TableHead>
+ 154: 							<TableHead className="text-right">Priority</TableHead>
+ 155: 							<TableHead>Expression</TableHead>
+ 156: 							<TableHead>Enabled</TableHead>
+ 157: 							<TableHead className="text-right">Actions</TableHead>
+ 158: 						</TableRow>
+ 159: 					</TableHeader>
+ 160: 					<TableBody>
+ 161: 						{[...Array(5)].map((_, i) => (
+ 162: 							<TableRow key={i}>
+ 163: 								<TableCell colSpan={7} className="h-10">
+ 164: 									<div className="bg-muted h-2 w-32 animate-pulse rounded" />
+ 165: 								</TableCell>
+ 166: 							</TableRow>
+ 167: 						))}
+ 168: 					</TableBody>
+ 169: 				</Table>
+ 170: 			</div>
+ 171: 		);
+ 172: 	}
+ 173: 
+ 174: 	const sortedRules = rules ? [...rules].sort((a, b) => a.priority - b.priority) : [];
+ 175: 	const ruleToDelete = sortedRules.find((r) => r.id === deleteRuleId);
+ 176: 
+ 177: 	return (
+ 178: 		<>
+ 179: 			{/* Toolbar: Search + Actions */}
+ 180: 			<div className="mb-4 flex flex-wrap items-center gap-3">
+ 181: 				<div className="relative max-w-sm flex-1">
+ 182: 					<Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+ 183: 					<Input
+ 184: 						aria-label="Search routing rules by name"
+ 185: 						placeholder="Search by name..."
+ 186: 						value={search}
+ 187: 						onChange={(e) => onSearchChange(e.target.value)}
+ 188: 						className="pl-9"
+ 189: 						data-testid="routing-rules-search-input"
+ 190: 					/>
+ 191: 				</div>
+ 192: 				{actions && <div className="flex items-center gap-2 sm:ml-auto">{actions}</div>}
+ 193: 			</div>
+ 194: 
+ 195: 			<div className="mb-2 overflow-hidden rounded-sm border">
+ 196: 				<Table containerClassName="h-full overflow-auto">
+ 197: 					<TableHeader className="bg-muted sticky top-0 z-10">
+ 198: 						<TableRow className="bg-muted/50">
+ 199: 							<TableHead className="font-semibold">Name</TableHead>
+ 200: 							<TableHead className="font-semibold">Targets</TableHead>
+ 201: 							<TableHead className="font-semibold">Scope</TableHead>
+ 202: 							<TableHead className="text-right font-semibold">Priority</TableHead>
+ 203: 							<TableHead className="font-semibold">Expression</TableHead>
+ 204: 							<TableHead className="font-semibold">Status</TableHead>
+ 205: 							<TableHead className={`bg-muted sticky right-0 z-30 w-[50px] text-right font-semibold ${PIN_SHADOW_RIGHT}`}>
+ 206: 								Actions
+ 207: 							</TableHead>
+ 208: 						</TableRow>
+ 209: 					</TableHeader>
+ 210: 					<TableBody>
+ 211: 						{sortedRules.length === 0 ? (
+ 212: 							<TableRow>
+ 213: 								<TableCell colSpan={7} className="h-24 text-center">
+ 214: 									<span className="text-muted-foreground text-sm">No matching routing rules found.</span>
+ 215: 								</TableCell>
+ 216: 							</TableRow>
+ 217: 						) : (
+ 218: 							sortedRules.map((rule) => (
+ 219: 								<TableRow
+ 220: 									key={rule.id}
+ 221: 									className="group hover:bg-muted/50 cursor-pointer transition-colors"
+ 222: 									onClick={() => onRowClick(rule)}
+ 223: 								>
+ 224: 									<TableCell className="font-medium">
+ 225: 										<div className="flex flex-col gap-1">
+ 226: 											<span className="max-w-xs truncate">{rule.name}</span>
+ 227: 											{rule.description && (
+ 228: 												<span data-testid="routing-rule-description" className="text-muted-foreground max-w-xs truncate text-xs">
+ 229: 													{rule.description}
+ 230: 												</span>
+ 231: 											)}
+ 232: 										</div>
+ 233: 									</TableCell>
+ 234: 									<TableCell>
+ 235: 										<TargetsSummary targets={rule.targets || []} />
+ 236: 									</TableCell>
+ 237: 									<TableCell>
+ 238: 										<Badge variant="secondary">{getScopeLabel(rule.scope)}</Badge>
+ 239: 									</TableCell>
+ 240: 									<TableCell className="text-right">
+ 241: 										<div className={`inline-block rounded px-2.5 py-1 text-xs font-medium ${getPriorityBadgeClass()}`}>{rule.priority}</div>
+ 242: 									</TableCell>
+ 243: 									<TableCell>
+ 244: 										<span className="text-muted-foreground block max-w-xs truncate font-mono text-xs" title={rule.cel_expression}>
+ 245: 											{truncateCELExpression(rule.cel_expression)}
+ 246: 										</span>
+ 247: 									</TableCell>
+ 248: 									<TableCell onClick={(e) => e.stopPropagation()}>
+ 249: 										<Switch

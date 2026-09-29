@@ -1,0 +1,33 @@
+340: 						<AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+341: 						<AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+342: 							{isDeleting ? "Deleting..." : "Delete"}
+343: 						</AlertDialogAction>
+344: 					</AlertDialogFooter>
+345: 				</AlertDialogContent>
+346: 			</AlertDialog>
+347: 		</>
+348: 	);
+349: }
+350: 
+351: function TargetsSummary({ targets }: { targets: RoutingTarget[] }) {
+352: 	if (!targets || targets.length === 0) {
+353: 		return <span className="text-muted-foreground text-sm">-</span>;
+354: 	}
+355: 
+356: 	const first = targets[0];
+357: 	const label = [first.provider ? getProviderLabel(first.provider) : "Any", first.model || "Any model"].join(" / ");
+358: 
+359: 	return (
+360: 		<div className="flex flex-col gap-1">
+361: 			<div className="flex items-center gap-1.5">
+362: 				{first.provider && <RenderProviderIcon provider={first.provider as ProviderIconType} size="sm" className="h-4 w-4 shrink-0" />}
+363: 				<span className="max-w-[160px] truncate text-sm">{label}</span>
+364: 			</div>
+365: 			{targets.length > 1 && (
+366: 				<span className="text-muted-foreground text-xs">
+367: 					+{targets.length - 1} more target{targets.length > 2 ? "s" : ""}
+368: 				</span>
+369: 			)}
+370: 		</div>
+371: 	);
+372: }

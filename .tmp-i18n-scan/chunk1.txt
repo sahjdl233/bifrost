@@ -1,0 +1,18 @@
+ 153: 							</Button>
+ 154: 						)}
+ 155: 					</>
+ 156: 				}
+ 157: 			/>
+ 158: 
+ 159: 			<RoutingRuleSheet open={dialogOpen} onOpenChange={handleDialogOpenChange} editingRule={editingRule} />
+ 160: 			<RoutingRuleInfoSheet
+ 161: 				rule={selectedRule}
+ 162: 				open={infoSheetOpen}
+ 163: 				onOpenChange={setInfoSheetOpen}
+ 164: 				onNavigate={handleRuleNavigate}
+ 165: 				hasPrev={selectedRuleIndex > 0}
+ 166: 				hasNext={selectedRuleIndex >= 0 && selectedRuleIndex < sortedRules.length - 1}
+ 167: 			/>
+ 168: 		</div>
+ 169: 	);
+ 170: }

@@ -1,0 +1,52 @@
+ 198: 						<TableRow className="bg-muted/50">
+ 199: 							<TableHead className="font-semibold">Name</TableHead>
+ 200: 							<TableHead className="font-semibold">Targets</TableHead>
+ 201: 							<TableHead className="font-semibold">Scope</TableHead>
+ 202: 							<TableHead className="text-right font-semibold">Priority</TableHead>
+ 203: 							<TableHead className="font-semibold">Expression</TableHead>
+ 204: 							<TableHead className="font-semibold">Status</TableHead>
+ 205: 							<TableHead className={`bg-muted sticky right-0 z-30 w-[50px] text-right font-semibold ${PIN_SHADOW_RIGHT}`}>
+ 206: 								Actions
+ 207: 							</TableHead>
+ 208: 						</TableRow>
+ 209: 					</TableHeader>
+ 210: 					<TableBody>
+ 211: 						{sortedRules.length === 0 ? (
+ 212: 							<TableRow>
+ 213: 								<TableCell colSpan={7} className="h-24 text-center">
+ 214: 									<span className="text-muted-foreground text-sm">No matching routing rules found.</span>
+ 215: 								</TableCell>
+ 216: 							</TableRow>
+ 217: 						) : (
+ 218: 							sortedRules.map((rule) => (
+ 219: 								<TableRow
+ 220: 									key={rule.id}
+ 221: 									className="group hover:bg-muted/50 cursor-pointer transition-colors"
+ 222: 									onClick={() => onRowClick(rule)}
+ 223: 								>
+ 224: 									<TableCell className="font-medium">
+ 225: 										<div className="flex flex-col gap-1">
+ 226: 											<span className="max-w-xs truncate">{rule.name}</span>
+ 227: 											{rule.description && (
+ 228: 												<span data-testid="routing-rule-description" className="text-muted-foreground max-w-xs truncate text-xs">
+ 229: 													{rule.description}
+ 230: 												</span>
+ 231: 											)}
+ 232: 										</div>
+ 233: 									</TableCell>
+ 234: 									<TableCell>
+ 235: 										<TargetsSummary targets={rule.targets || []} />
+ 236: 									</TableCell>
+ 237: 									<TableCell>
+ 238: 										<Badge variant="secondary">{getScopeLabel(rule.scope)}</Badge>
+ 239: 									</TableCell>
+ 240: 									<TableCell className="text-right">
+ 241: 										<div className={`inline-block rounded px-2.5 py-1 text-xs font-medium ${getPriorityBadgeClass()}`}>{rule.priority}</div>
+ 242: 									</TableCell>
+ 243: 									<TableCell>
+ 244: 										<span className="text-muted-foreground block max-w-xs truncate font-mono text-xs" title={rule.cel_expression}>
+ 245: 											{truncateCELExpression(rule.cel_expression)}
+ 246: 										</span>
+ 247: 									</TableCell>
+ 248: 									<TableCell onClick={(e) => e.stopPropagation()}>
+ 249: 										<Switch

@@ -1,0 +1,135 @@
+238: 										<Badge variant="secondary">{getScopeLabel(rule.scope)}</Badge>
+239: 									</TableCell>
+240: 									<TableCell className="text-right">
+241: 										<div className={`inline-block rounded px-2.5 py-1 text-xs font-medium ${getPriorityBadgeClass()}`}>{rule.priority}</div>
+242: 									</TableCell>
+243: 									<TableCell>
+244: 										<span className="text-muted-foreground block max-w-xs truncate font-mono text-xs" title={rule.cel_expression}>
+245: 											{truncateCELExpression(rule.cel_expression)}
+246: 										</span>
+247: 									</TableCell>
+248: 									<TableCell onClick={(e) => e.stopPropagation()}>
+249: 										<Switch
+250: 											data-testid={`routing-rule-enabled-${rule.id}-switch`}
+251: 											checked={rule.enabled ?? true}
+252: 											size="md"
+253: 											disabled={!canUpdate}
+254: 											onAsyncCheckedChange={async (checked) => {
+255: 												await updateRoutingRule({
+256: 													id: rule.id,
+257: 													data: { enabled: checked },
+258: 												})
+259: 													.unwrap()
+260: 													.then(() => {
+261: 														toast.success(`Rule ${checked ? "enabled" : "disabled"} successfully`);
+262: 													})
+263: 													.catch((err) => {
+264: 														toast.error("Failed to update rule", {
+265: 															description: getErrorMessage(err),
+266: 														});
+267: 													});
+268: 											}}
+269: 										/>
+270: 									</TableCell>
+271: 									<TableCell
+272: 										className={`group-hover:bg-muted dark:bg-card dark:group-hover:bg-muted sticky right-0 z-20 bg-white text-right ${PIN_SHADOW_RIGHT}`}
+273: 										onClick={(e) => e.stopPropagation()}
+274: 									>
+275: 										<div className="flex items-center justify-center">
+276: 											<RoutingRuleActionsMenu
+277: 												rule={rule}
+278: 												canUpdate={canUpdate}
+279: 												canDelete={canDelete}
+280: 												onEdit={onEdit}
+281: 												onDelete={setDeleteRuleId}
+282: 											/>
+283: 										</div>
+284: 									</TableCell>
+285: 								</TableRow>
+286: 							))
+287: 						)}
+288: 					</TableBody>
+289: 				</Table>
+290: 			</div>
+291: 
+292: 			{/* Pagination */}
+293: 			{totalCount > 0 && (
+294: 				<div className="flex shrink-0 items-center justify-between text-xs" data-testid="pagination">
+295: 					<div className="text-muted-foreground flex items-center gap-2">
+296: 						{(offset + 1).toLocaleString()}-{Math.min(offset + limit, totalCount).toLocaleString()} of {totalCount.toLocaleString()} entries
+297: 					</div>
+298: 
+299: 					<div className="flex items-center gap-2">
+300: 						<Button
+301: 							variant="ghost"
+302: 							size="sm"
+303: 							onClick={() => onOffsetChange(Math.max(0, offset - limit))}
+304: 							disabled={offset === 0}
+305: 							data-testid="routing-rules-pagination-prev-btn"
+306: 							aria-label="Previous page"
+307: 						>
+308: 							<ChevronLeft className="size-3" />
+309: 						</Button>
+310: 
+311: 						<div className="flex items-center gap-1">
+312: 							<span>Page</span>
+313: 							<span>{Math.floor(offset / limit) + 1}</span>
+314: 							<span>of {Math.ceil(totalCount / limit)}</span>
+315: 						</div>
+316: 
+317: 						<Button
+318: 							variant="ghost"
+319: 							size="sm"
+320: 							onClick={() => onOffsetChange(offset + limit)}
+321: 							disabled={offset + limit >= totalCount}
+322: 							data-testid="routing-rules-pagination-next-btn"
+323: 							aria-label="Next page"
+324: 						>
+325: 							<ChevronRight className="size-3" />
+326: 						</Button>
+327: 					</div>
+328: 				</div>
+329: 			)}
+330: 
+331: 			<AlertDialog open={!!deleteRuleId} onOpenChange={(open) => !open && setDeleteRuleId(null)}>
+332: 				<AlertDialogContent>
+333: 					<AlertDialogHeader>
+334: 						<AlertDialogTitle>Delete Routing Rule</AlertDialogTitle>
+335: 						<AlertDialogDescription>
+336: 							Are you sure you want to delete &quot;{ruleToDelete?.name}&quot;? This action cannot be undone.
+337: 						</AlertDialogDescription>
+338: 					</AlertDialogHeader>
+339: 					<AlertDialogFooter>
+340: 						<AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+341: 						<AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+342: 							{isDeleting ? "Deleting..." : "Delete"}
+343: 						</AlertDialogAction>
+344: 					</AlertDialogFooter>
+345: 				</AlertDialogContent>
+346: 			</AlertDialog>
+347: 		</>
+348: 	);
+349: }
+350: 
+351: function TargetsSummary({ targets }: { targets: RoutingTarget[] }) {
+352: 	if (!targets || targets.length === 0) {
+353: 		return <span className="text-muted-foreground text-sm">-</span>;
+354: 	}
+355: 
+356: 	const first = targets[0];
+357: 	const label = [first.provider ? getProviderLabel(first.provider) : "Any", first.model || "Any model"].join(" / ");
+358: 
+359: 	return (
+360: 		<div className="flex flex-col gap-1">
+361: 			<div className="flex items-center gap-1.5">
+362: 				{first.provider && <RenderProviderIcon provider={first.provider as ProviderIconType} size="sm" className="h-4 w-4 shrink-0" />}
+363: 				<span className="max-w-[160px] truncate text-sm">{label}</span>
+364: 			</div>
+365: 			{targets.length > 1 && (
+366: 				<span className="text-muted-foreground text-xs">
+367: 					+{targets.length - 1} more target{targets.length > 2 ? "s" : ""}
+368: 				</span>
+369: 			)}
+370: 		</div>
+371: 	);
+372: }

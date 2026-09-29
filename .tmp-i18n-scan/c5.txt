@@ -1,0 +1,50 @@
+ 150: 						<TableRow>
+ 151: 							<TableHead>Name</TableHead>
+ 152: 							<TableHead>Targets</TableHead>
+ 153: 							<TableHead>Scope</TableHead>
+ 154: 							<TableHead className="text-right">Priority</TableHead>
+ 155: 							<TableHead>Expression</TableHead>
+ 156: 							<TableHead>Enabled</TableHead>
+ 157: 							<TableHead className="text-right">Actions</TableHead>
+ 158: 						</TableRow>
+ 159: 					</TableHeader>
+ 160: 					<TableBody>
+ 161: 						{[...Array(5)].map((_, i) => (
+ 162: 							<TableRow key={i}>
+ 163: 								<TableCell colSpan={7} className="h-10">
+ 164: 									<div className="bg-muted h-2 w-32 animate-pulse rounded" />
+ 165: 								</TableCell>
+ 166: 							</TableRow>
+ 167: 						))}
+ 168: 					</TableBody>
+ 169: 				</Table>
+ 170: 			</div>
+ 171: 		);
+ 172: 	}
+ 173: 
+ 174: 	const sortedRules = rules ? [...rules].sort((a, b) => a.priority - b.priority) : [];
+ 175: 	const ruleToDelete = sortedRules.find((r) => r.id === deleteRuleId);
+ 176: 
+ 177: 	return (
+ 178: 		<>
+ 179: 			{/* Toolbar: Search + Actions */}
+ 180: 			<div className="mb-4 flex flex-wrap items-center gap-3">
+ 181: 				<div className="relative max-w-sm flex-1">
+ 182: 					<Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+ 183: 					<Input
+ 184: 						aria-label="Search routing rules by name"
+ 185: 						placeholder="Search by name..."
+ 186: 						value={search}
+ 187: 						onChange={(e) => onSearchChange(e.target.value)}
+ 188: 						className="pl-9"
+ 189: 						data-testid="routing-rules-search-input"
+ 190: 					/>
+ 191: 				</div>
+ 192: 				{actions && <div className="flex items-center gap-2 sm:ml-auto">{actions}</div>}
+ 193: 			</div>
+ 194: 
+ 195: 			<div className="mb-2 overflow-hidden rounded-sm border">
+ 196: 				<Table containerClassName="h-full overflow-auto">
+ 197: 					<TableHeader className="bg-muted sticky top-0 z-10">
+ 198: 						<TableRow className="bg-muted/50">
+ 199: 							<TableHead className="font-semibold">Name</TableHead>
